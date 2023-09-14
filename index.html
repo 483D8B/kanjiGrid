@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="data.js"></script>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        /* CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Your style here*/
+
+        /*CLASSES*/
+        .divTable {
+            display: table;
+
+        }
+
+        .divTableBody {
+            display: table-row-group;
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            gap: 2px 2px;
+
+        }
+
+        .divTableCell {
+            border: 2px solid silver;
+            display: table-cell;
+            padding-left: 10px;
+            padding-right: 10px;
+            box-sizing: content-box;
+        }
+
+        .kanji {
+            font-size: calc(1vw + 1vh + 1vmin);
+            font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+            text-align: center;
+        }
+
+        .keyword {
+            position: inline;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            text-align: center;
+            white-space: normal;
+            cursor: pointer;
+            justify-content: space-between;
+            align-items: center;
+            color: black;
+        }
+
+        .framenr {
+            text-align: center;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            font-size: small;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Your content here -->
+    <input type="range" id="fileSlider" min="1" max="3" value="1" onchange="loadDataFile()">
+
+    <div class="divTable" id="kanji_table">
+        <div class="divTableBody" id="table_body">
+            <!-- Data will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Your script here
+        $(document).ready(function () {
+            // Parse the CSV data with PapaParse
+            Papa.parse(csvData, {
+                delimiter: ',', // Set the delimiter to a comma
+                header: true, // Treat the first row as headers
+                skipEmptyLines: true, // Skip empty lines
+                complete: function (results) {
+                    var dataArray = results.data; // Parsed data in an array of objects
+
+                    // Populate the table with individual cells
+                    var tableBody = $("#table_body");
+
+                    dataArray.forEach(function (entry) {
+                        // Create a cell for each property
+                        var cellStructure = `
+            <div class="divTableCell" id="${entry.FrameNumber}">
+              <div class="framenr">${entry.FrameNumber}</div>
+              <div class="kanji">${entry.Kanji}</div>
+              <div class="keyword" style="display: none">${entry.Keyword}</div>
+            </div>
+          `;
+
+                        tableBody.append(cellStructure);
+
+                        const element = document.getElementById(`${entry.FrameNumber}`);
+                        // Check if the element exists
+                        if (element) {
+                            switch (entry.LeitnerBox) {
+                                case "1":
+                                    element.style.backgroundColor = "#E67373";
+                                    break;
+                                case "2":
+                                    element.style.backgroundColor = "#E6C973";
+                                    break;
+                                case "3":
+                                    element.style.backgroundColor = "#ACE673";
+                                    break;
+                                case "4":
+                                    element.style.backgroundColor = "#73E690";
+                                    break;
+                                case "5":
+                                    element.style.backgroundColor = "#73E6E6";
+                                    break;
+                                case "6":
+                                    element.style.backgroundColor = "#7390E6";
+                                    break;
+                                case "7":
+                                    element.style.backgroundColor = "#AC73E6";
+                                    break;
+                            }
+
+                        }
+                    });
+                },
+            });
+
+
+
+        });
+        function loadDataFile() {
+        // Get the current slider value
+        var sliderValue = document.getElementById("fileSlider").value;
+
+        // Define the filenames for your data.js files
+        var fileNames = ["koohii_2023-09-13.js", "koohii_2023-09-14.js", "koohii_2023-09-15.js"];
+
+        // Ensure the slider value is within the valid range
+        if (sliderValue >= 1 && sliderValue <= fileNames.length) {
+            // Generate the URL for the selected data.js file
+            var selectedFile = fileNames[sliderValue - 1]; // Adjust index
+            var xhr = new XMLHttpRequest();
+
+            // Configure the AJAX request
+            xhr.open('GET', selectedFile, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Successfully loaded the data.js file
+                    var jsonData = JSON.parse(xhr.responseText);
+
+                    // Clear the previous data
+                    var tableBody = document.getElementById("table_body");
+                    tableBody.innerHTML = '';
+
+                    // Populate the table with the new data
+                    jsonData.forEach(function (entry) {
+                        var cellStructure = `
+                            <div class="divTableCell" id="${entry.FrameNumber}">
+                                <div class="framenr">${entry.FrameNumber}</div>
+                                <div class="kanji">${entry.Kanji}</div>
+                                <div class="keyword" style="display: none">${entry.Keyword}</div>
+                            </div>
+                        `;
+
+                        tableBody.insertAdjacentHTML('beforeend', cellStructure);
+
+                        const element = document.getElementById(`${entry.FrameNumber}`);
+                        // Check if the element exists
+                        if (element) {
+                            switch (entry.LeitnerBox) {
+                                case "1":
+                                    element.style.backgroundColor = "#E67373";
+                                    break;
+                                case "2":
+                                    element.style.backgroundColor = "#E6C973";
+                                    break;
+                                case "3":
+                                    element.style.backgroundColor = "#ACE673";
+                                    break;
+                                case "4":
+                                    element.style.backgroundColor = "#73E690";
+                                    break;
+                                case "5":
+                                    element.style.backgroundColor = "#73E6E6";
+                                    break;
+                                case "6":
+                                    element.style.backgroundColor = "#7390E6";
+                                    break;
+                                case "7":
+                                    element.style.backgroundColor = "#AC73E6";
+                                    break;
+                            }
+                        }
+                    });
+                }
+            };
+
+            // Send the AJAX request
+            xhr.send();
+        }
+    }
+
+    // Initial load of data.js (when the page loads)
+    loadDataFile();
+
+    // Add an event listener to the slider
+    document.getElementById("fileSlider").addEventListener("change", loadDataFile);
+    </script>
+
+</body>
+
+</html>
