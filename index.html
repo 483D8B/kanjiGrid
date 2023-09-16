@@ -44,6 +44,7 @@
             font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
             text-align: center;
             font-size: 3em;
+            user-select: none;
         }
 
         .keyword {
@@ -66,6 +67,7 @@
             -moz-user-select: none;
             -webkit-user-select: none;
             font-size: 1em;
+            font-family: Verdana, sans-serif;
         }
 
         #fileSlider {
@@ -76,15 +78,27 @@
             display: block;
         }
 
+        .zoomContainer {
+            margin: 0 auto; 
+            width: 100px;
+            margin-left: 1.5em;
+        }
+
         
         #zoomSlider {
-            margin: 0 auto; 
             text-align: center;
             box-sizing: border-box;
             display: block;
             width: 100px;
-            margin-left: 1.5em;
         }
+
+        #ZoomLabel {
+            position: relative;
+            box-sizing: border-box;
+            margin-left: 1.5em;
+            font-family: Verdana, sans-serif;
+        }
+
 
         #datasetDate {
             position: relative;
@@ -92,6 +106,19 @@
             text-align: center;
             box-sizing: border-box;
             font-weight: 700;
+            user-select: none;
+            font-family: Verdana, sans-serif;
+        }
+
+        .key {
+            display: inline-block;
+            width: 2em;
+            text-align: center;
+            user-select: none;
+        }
+
+        p{
+            user-select: none;
         }
     </style>
 </head>
@@ -100,7 +127,15 @@
     <input type="range" id="fileSlider" min="1" max="30" value="1">
     <span id="datasetDate">September 13, 2023</span>
 
-    <input type="range" id="zoomSlider" min="0" max="1" step="1" value="1">
+    <div class="zoomContainer">
+        <input autocomplete="off" type="range" id="zoomSlider" min="0" max="1" step="1" value="1">
+        <span id="ZoomLabel">Zoom</span>
+    </div>
+
+
+    <p style="text-align:center">
+        Weak&nbsp;<span class="key" style="background-color: #E67373;"> </span><span class="key" style="background-color: #E6C973;"> </span><span class="key" style="background-color: #ACE673;"> </span><span class="key" style="background-color: #73E690;"> </span><span class="key" style="background-color: #73E6E6;"> </span><span class="key" style="background-color: #7390E6;"> </span><span class="key" style="background-color: #AC73E6;"> </span>&nbsp;Strong
+    </p>
 
     <!-- Your content here -->
     <div class="divTable" id="kanji_table">
@@ -13760,29 +13795,34 @@
 
 
 
+        document.getElementById("zoomSlider").defaultValue = 1
+
 
             // Function to set background color based on value
             function setBackgroundColor(element, value) {
                 switch (value) {
                     case 1:
-                        element.css("background-color", "#E67373");
+                        element.css("background-color", "#C0C0C0");
                         break;
                     case 2:
-                        element.css("background-color", "#E6C973");
+                        element.css("background-color", "#E67373");
                         break;
                     case 3:
-                        element.css("background-color", "#ACE673");
+                        element.css("background-color", "#E6C973");
                         break;
                     case 4:
-                        element.css("background-color", "#73E690");
+                        element.css("background-color", "#ACE673");
                         break;
                     case 5:
-                        element.css("background-color", "#73E6E6");
+                        element.css("background-color", "#73E690");
                         break;
                     case 6:
-                        element.css("background-color", "#7390E6");
+                        element.css("background-color", "#73E6E6");
                         break;
                     case 7:
+                        element.css("background-color", "#7390E6");
+                        break;
+                    case 8:
                         element.css("background-color", "#AC73E6");
                         break;
                     default:
