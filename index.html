@@ -71,7 +71,7 @@
         }
 
         #fileSlider {
-            margin: 0 auto; 
+            margin: 0 auto;
             width: 95%;
             text-align: center;
             box-sizing: border-box;
@@ -79,12 +79,12 @@
         }
 
         .zoomContainer {
-            margin: 0 auto; 
+            margin: 0 auto;
             width: 100px;
             margin-left: 1.5em;
         }
 
-        
+
         #zoomSlider {
             text-align: center;
             box-sizing: border-box;
@@ -118,7 +118,7 @@
             font-family: Verdana, sans-serif;
         }
 
-        p{
+        p {
             user-select: none;
             font-family: Verdana, sans-serif;
         }
@@ -126,7 +126,7 @@
 </head>
 
 <body>
-    <input type="range" id="fileSlider" min="1" max="30" value="1">
+    <input autocomplete="off" type="range" id="fileSlider" min="1" max="30" value="1">
     <span id="datasetDate">September 13, 2023</span>
 
     <div class="zoomContainer">
@@ -136,7 +136,13 @@
 
 
     <p style="text-align:center">
-        Weak&nbsp;<span class="key" style="background-color: #E67373;"> </span><span class="key" style="background-color: #E6C973;"> </span><span class="key" style="background-color: #ACE673;"> </span><span class="key" style="background-color: #73E690;"> </span><span class="key" style="background-color: #73E6E6;"> </span><span class="key" style="background-color: #7390E6;"> </span><span class="key" style="background-color: #AC73E6;"> </span>&nbsp;Strong
+        Weak&nbsp;<span class="key" style="background-color: #E67373;"> </span><span class="key"
+            style="background-color: #E6C973;"> </span><span class="key"
+            style="background-color: #ACE673;"> </span><span class="key"
+            style="background-color: #73E690;"> </span><span class="key"
+            style="background-color: #73E6E6;"> </span><span class="key"
+            style="background-color: #7390E6;"> </span><span class="key"
+            style="background-color: #AC73E6;"> </span>&nbsp;Strong
     </p>
 
     <!-- Your content here -->
@@ -13790,14 +13796,18 @@
         $(document).ready(function () {
 
             const leitnerData = {
-  "koohii_2023-09-13": {1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2, 20: 2, 21: 2, 22: 2, 23: 2, 24: 2, 25: 2, 26: 2, 27: 2, 28: 2, 29: 2, 30: 2, 31: 2, 32: 2, 33: 2, 34: 2, 35: 2, 36: 2, 37: 2, 38: 2, 39: 2, 40: 2, 41: 2, 42: 2, 43: 2, 44: 2, 45: 2, 46: 2, 47: 2, 48: 2, 49: 2, 50: 2, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 2, 58: 2, 59: 2, 60: 2, 61: 2, 62: 2, 63: 2, 64: 2, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 71: 2, 72: 2, 73: 2, 74: 2, 75: 2, 76: 2, 77: 2, 78: 2, 79: 2, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 2, 86: 2, 87: 2, 88: 2, 89: 2, 90: 2, 91: 2, 92: 2, 93: 2, 94: 2, 95: 2, 96: 2, 97: 2, 98: 2},
-  "koohii_2023-09-14": {1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2, 20: 3, 21: 2, 22: 2, 23: 2, 24: 2, 25: 2, 26: 2, 27: 2, 28: 2, 29: 2, 30: 2, 31: 2, 32: 2, 33: 2, 34: 2, 35: 3, 36: 3, 37: 2, 38: 2, 39: 3, 40: 3, 41: 2, 42: 2, 43: 2, 44: 2, 45: 2, 46: 2, 47: 2, 48: 2, 49: 2, 50: 3, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 3, 58: 2, 59: 3, 60: 3, 61: 2, 62: 2, 63: 3, 64: 2, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 2, 72: 2, 73: 2, 74: 3, 75: 2, 76: 3, 77: 2, 78: 3, 79: 3, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 3, 86: 3, 87: 2, 88: 2, 89: 2, 90: 3, 91: 2, 92: 2, 93: 2, 94: 2, 95: 2, 96: 3, 97: 2, 98: 3, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2},
-  "koohii_2023-09-15": {1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2, 20: 3, 21: 2, 22: 3, 23: 2, 24: 2, 25: 2, 26: 2, 27: 3, 28: 3, 29: 2, 30: 2, 31: 2, 32: 2, 33: 2, 34: 3, 35: 3, 36: 3, 37: 2, 38: 2, 39: 3, 40: 3, 41: 3, 42: 2, 43: 2, 44: 2, 45: 2, 46: 3, 47: 2, 48: 2, 49: 2, 50: 3, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 3, 58: 2, 59: 3, 60: 3, 61: 3, 62: 2, 63: 3, 64: 2, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 2, 73: 2, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 2, 81: 3, 82: 2, 83: 2, 84: 2, 85: 3, 86: 3, 87: 2, 88: 2, 89: 2, 90: 3, 91: 2, 92: 2, 93: 2, 94: 2, 95: 2, 96: 3, 97: 2, 98: 3, 99: 2, 100: 2, 101: 2, 102: 2, 103: 3, 104: 2, 105: 3, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 3, 120: 2, 121: 2, 122: 2, 123: 2, 124: 2, 125: 2, 126: 2, 127: 2, 128: 2, 129: 2, 130: 2, 131: 2, 132: 2, 133: 2},
-};
+                "koohii_2023-09-13": { 1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2, 20: 2, 21: 2, 22: 2, 23: 2, 24: 2, 25: 2, 26: 2, 27: 2, 28: 2, 29: 2, 30: 2, 31: 2, 32: 2, 33: 2, 34: 2, 35: 2, 36: 2, 37: 2, 38: 2, 39: 2, 40: 2, 41: 2, 42: 2, 43: 2, 44: 2, 45: 2, 46: 2, 47: 2, 48: 2, 49: 2, 50: 2, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 2, 58: 2, 59: 2, 60: 2, 61: 2, 62: 2, 63: 2, 64: 2, 65: 2, 66: 2, 67: 2, 68: 2, 69: 2, 70: 2, 71: 2, 72: 2, 73: 2, 74: 2, 75: 2, 76: 2, 77: 2, 78: 2, 79: 2, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 2, 86: 2, 87: 2, 88: 2, 89: 2, 90: 2, 91: 2, 92: 2, 93: 2, 94: 2, 95: 2, 96: 2, 97: 2, 98: 2 },
+                "koohii_2023-09-14": { 1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2, 20: 3, 21: 2, 22: 2, 23: 2, 24: 2, 25: 2, 26: 2, 27: 2, 28: 2, 29: 2, 30: 2, 31: 2, 32: 2, 33: 2, 34: 2, 35: 3, 36: 3, 37: 2, 38: 2, 39: 3, 40: 3, 41: 2, 42: 2, 43: 2, 44: 2, 45: 2, 46: 2, 47: 2, 48: 2, 49: 2, 50: 3, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 3, 58: 2, 59: 3, 60: 3, 61: 2, 62: 2, 63: 3, 64: 2, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 2, 72: 2, 73: 2, 74: 3, 75: 2, 76: 3, 77: 2, 78: 3, 79: 3, 80: 2, 81: 2, 82: 2, 83: 2, 84: 2, 85: 3, 86: 3, 87: 2, 88: 2, 89: 2, 90: 3, 91: 2, 92: 2, 93: 2, 94: 2, 95: 2, 96: 3, 97: 2, 98: 3, 99: 2, 100: 2, 101: 2, 102: 2, 103: 2, 104: 2, 105: 2, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 2, 120: 2 },
+                "koohii_2023-09-15": { 1: 2, 2: 2, 3: 2, 4: 2, 5: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2, 20: 3, 21: 2, 22: 3, 23: 2, 24: 2, 25: 2, 26: 2, 27: 3, 28: 3, 29: 2, 30: 2, 31: 2, 32: 2, 33: 2, 34: 3, 35: 3, 36: 3, 37: 2, 38: 2, 39: 3, 40: 3, 41: 3, 42: 2, 43: 2, 44: 2, 45: 2, 46: 3, 47: 2, 48: 2, 49: 2, 50: 3, 51: 2, 52: 2, 53: 2, 54: 2, 55: 2, 56: 2, 57: 3, 58: 2, 59: 3, 60: 3, 61: 3, 62: 2, 63: 3, 64: 2, 65: 3, 66: 3, 67: 3, 68: 3, 69: 3, 70: 3, 71: 3, 72: 2, 73: 2, 74: 3, 75: 3, 76: 3, 77: 3, 78: 3, 79: 3, 80: 2, 81: 3, 82: 2, 83: 2, 84: 2, 85: 3, 86: 3, 87: 2, 88: 2, 89: 2, 90: 3, 91: 2, 92: 2, 93: 2, 94: 2, 95: 2, 96: 3, 97: 2, 98: 3, 99: 2, 100: 2, 101: 2, 102: 2, 103: 3, 104: 2, 105: 3, 106: 2, 107: 2, 108: 2, 109: 2, 110: 2, 111: 2, 112: 2, 113: 2, 114: 2, 115: 2, 116: 2, 117: 2, 118: 2, 119: 3, 120: 2, 121: 2, 122: 2, 123: 2, 124: 2, 125: 2, 126: 2, 127: 2, 128: 2, 129: 2, 130: 2, 131: 2, 132: 2, 133: 2 },
+            };
 
+            // Get the number of datasets
+            const numberOfDatasets = Object.keys(leitnerData).length;
 
+            document.getElementById("zoomSlider").defaultValue = 1
 
-        document.getElementById("zoomSlider").defaultValue = 1
+            // Update the max attribute of the slider input element
+            $("#fileSlider").attr("max", numberOfDatasets);
 
 
             // Function to set background color based on value
@@ -13861,7 +13871,18 @@
             // Slider change event
             $("#fileSlider").on("input", function () {
                 const sliderValue = $(this).val();
-                const selectedDataset = `koohii_2023-09-${sliderValue}`;
+                const datasetKeys = Object.keys(leitnerData);
+
+                // Ensure sliderValue is within a valid range
+                const clampedValue = Math.min(Math.max(1, sliderValue), datasetKeys.length);
+
+                // Calculate the index based on clamped sliderValue
+                const datasetIndex = clampedValue - 1;
+
+                const selectedDataset = datasetKeys[datasetIndex];
+
+                // Log the selected dataset for debugging
+                console.log("Selected Dataset:", selectedDataset);
 
                 // Update the date display
                 updateDateDisplay(selectedDataset);
@@ -13881,9 +13902,10 @@
                 });
             });
 
-            // Initialize with the default slider value
-            const initialSliderValue = $("#fileSlider").val();
-            const initialDataset = `koohii_2023-09-${initialSliderValue}`;
+            // Initialize with the default slider value and dataset
+            let initialSliderValue = 1;
+            const datasetKeys = Object.keys(leitnerData);
+            let initialDataset = datasetKeys[0]; // Start with the first dataset
 
             // Initialize the date display
             updateDateDisplay(initialDataset);
@@ -13909,7 +13931,6 @@
 
                 $(".kanji").css("font-size", kanjiFontSize);
                 $(".framenr").css("font-size", framenrFontSize);
-
             });
 
 
@@ -13918,8 +13939,8 @@
 
         function myFunction(val) {
             document.getElementById("dateDisplay").innerHTML = val;
-        }   
-        
+        }
+
     </script>
 
 </body>
