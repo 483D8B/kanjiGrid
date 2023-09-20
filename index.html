@@ -225,6 +225,20 @@
     font-family: Verdana, sans-serif;
 }
 
+#mySearch {
+            background-color: silver;
+            color: black;
+            border-radius: 15px;
+            padding-left: 1%;
+            padding-right: 1%;
+            margin: 10px;
+            transition: width 0.4s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10vw;
+        }
+
     </style>
 </head>
 
@@ -258,10 +272,9 @@
             <button id="showKeyword">Show keyword</button>
         </div>
 
-
-
     </div>
 
+    <input id="mySearch" type="text" placeholder="Search...">
 
 
     <input autocomplete="off" type="range" id="fileSlider" min="1" max="30" value="1">
@@ -14209,6 +14222,33 @@ kanjiElements.forEach(function (element) {
         function myFunction(val) {
             document.getElementById("dateDisplay").innerHTML = val;
         }
+
+        $("#mySearch").focus();
+        $("#mySearch").on("input", function () {
+            var searchValue = $(this).val().toLowerCase();
+            var searchWords = searchValue.split(/\s+/).filter(Boolean); // Split the input into individual words
+
+            if (searchWords.length === 0) {
+                // If no search words are provided, show all sentences
+                $(".divTableCell").show();
+            } else {
+                $(".divTableCell").each(function () {
+                    var cellText = $(this).text().toLowerCase();
+                    var found = false; // Assume no words are found initially
+
+                    // Check each search word
+                    for (var i = 0; i < searchWords.length; i++) {
+                        if (cellText.includes(searchWords[i])) {
+                            found = true; // If any word is found, set found to true and break the loop
+                            break;
+                        }
+                    }
+
+                    // Toggle the visibility of the element based on whether at least one word is found
+                    $(this).toggle(found);
+                });
+            }
+        });
 
         
 
