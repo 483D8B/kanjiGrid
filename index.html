@@ -7,6 +7,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
+
+@font-face {
+    font-family: 'KanjiStrokeOrders';
+    src: url('KanjiStrokeOrders.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
         /* CSS Reset */
         * {
             margin: 0;
@@ -14167,6 +14175,33 @@ $("#showKeyword").click(function () {
                     cells.eq(i).toggle();
                 });
             });
+
+
+// Get all elements with class "kanji"
+var kanjiElements = document.querySelectorAll('.kanji');
+
+// Define a function to handle the double-click event
+function toggleFont(event) {
+    var element = event.target;
+
+    // Get the current font family
+    var currentFontFamily = window.getComputedStyle(element).getPropertyValue('font-family');
+
+    // Check if the font family is not "KanjiStrokeOrders"
+    if (currentFontFamily !== 'KanjiStrokeOrders') {
+        element.style.fontSize = '12em';
+        element.style.fontFamily = 'KanjiStrokeOrders';
+    } else {
+        element.style.fontSize = '3em';
+        element.style.fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif';
+    }
+}
+
+// Add a double-click event listener to each kanji element
+kanjiElements.forEach(function (element) {
+    element.addEventListener('dblclick', toggleFont);
+});
+
 
 
         });  //end doc ready
