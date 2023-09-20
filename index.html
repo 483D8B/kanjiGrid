@@ -110,7 +110,9 @@
 
         #datasetDate {
             position: relative;
-            left: 45vw;
+            left: 50vw;
+            width: 120px;
+            margin-left: -60px;
             text-align: center;
             box-sizing: border-box;
             font-weight: 700;
@@ -226,17 +228,18 @@
 }
 
 #mySearch {
+            position: absolute;
+            left: 50vw;
+            top: 50px;
+            margin-left: -50px; /*half of width*/
+            width: 100px;
             background-color: silver;
             color: black;
             border-radius: 15px;
             padding-left: 1%;
             padding-right: 1%;
-            margin: 10px;
             transition: width 0.4s ease-in-out;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 10vw;
+
         }
 
     </style>
@@ -274,7 +277,7 @@
 
     </div>
 
-    <input id="mySearch" type="text" placeholder="Search...">
+
 
 
     <input autocomplete="off" type="range" id="fileSlider" min="1" max="30" value="1">
@@ -285,7 +288,7 @@
         <span id="ZoomLabel">Zoom</span>
     </div>
 
-
+    <input id="mySearch" type="text" placeholder="Search...">
     <p style="text-align:center">
         Weak&nbsp;<span class="key" 
             style="background-color: #E67373;"> </span><span class="key"
