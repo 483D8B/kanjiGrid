@@ -1,4 +1,4 @@
-<!-- version 4 12/10/2023 -->
+<!-- version 4 14/10/2023 -->
 <!DOCTYPE html>
 <html>
 
@@ -6,7 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://483d8b.pythonanywhere.com/leitner.js" type="text/javascript"></script>
+    <!-- <script src="leitner.js"></script> -->
+    <script src="https://483d8b.pythonanywhere.com/leitner.js"></script>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         @font-face {
@@ -242,8 +243,8 @@
             top: 5em;
             margin-left: -50px;
             /*half of width*/
-            width: 100px;
-            background-color: silver;
+            width: 10em;
+            background-color: whitesmoke;
             color: black;
             border-radius: 15px;
             padding-left: 1%;
@@ -14007,46 +14008,14 @@
 
         $(document).ready(function () {
 
-            //doesn't work as expected
-            // const zoomSlider = document.getElementById('zoomSlider');
-            // const divTable = document.querySelector('.divTable');
-            // const divTableCells = document.querySelectorAll('.divTableCell');
-            // const minFontSize = 0.8; // Set a minimum font size here
-
-            // function updateTableFontSize() {
-            //     const zoomValue = zoomSlider.value;
-            //     const viewportWidth = window.innerWidth;
-            //     const tableWidth = divTable.offsetWidth;
-
-            //     // Calculate the required font size based on the ratio of viewport width and table width
-            //     let fontSize = (viewportWidth / tableWidth) * zoomValue * 0.8;
-
-            //     // Ensure the font size doesn't go below the minimum
-            //     if (fontSize < minFontSize) {
-            //         fontSize = minFontSize;
-            //     }
-
-            //     // Apply the calculated font size to all table cells
-            //     divTableCells.forEach(cell => {
-            //         cell.style.fontSize = fontSize + 'em';
-            //     });
-            // }
-
-            // // Initial setup and event listeners
-            // updateTableFontSize();
-            // zoomSlider.addEventListener('input', updateTableFontSize);
-
-            // // Update the font size when the window is resized
-            // window.addEventListener('resize', updateTableFontSize);
-
 
             const KanjiTotal = 2273;
 
-            
+
             //STARTING REPLACE FROM HERE
-            
-            
-            
+
+
+
             //ENDING REPLACE HERE
 
 
@@ -14060,44 +14029,27 @@
             $("#fileSlider").attr("max", numberOfDatasets);
 
 
+            // Define an object to map values to background colors
+            const valueToBackgroundColor = {
+                1: "#C0C0C0",
+                2: "#E67373",
+                3: "#E6C973",
+                4: "#ACE673",
+                5: "#73E690",
+                6: "#73E6E6",
+                7: "#7390E6",
+                8: "#AC73E6",
+                9: "#EE82EE",
+                100: "#645452",
+                default: "#FFFFFF" // Default background color
+            };
+
             // Function to set background color based on value
             function setBackgroundColor(element, value) {
-                switch (value) {
-                    case 1:
-                        element.css("background-color", "#C0C0C0");
-                        break;
-                    case 2:
-                        element.css("background-color", "#E67373");
-                        break;
-                    case 3:
-                        element.css("background-color", "#E6C973");
-                        break;
-                    case 4:
-                        element.css("background-color", "#ACE673");
-                        break;
-                    case 5:
-                        element.css("background-color", "#73E690");
-                        break;
-                    case 6:
-                        element.css("background-color", "#73E6E6");
-                        break;
-                    case 7:
-                        element.css("background-color", "#7390E6");
-                        break;
-                    case 8:
-                        element.css("background-color", "#AC73E6");
-                        break;
-                    case 9:
-                        element.css("background-color", "#EE82EE");
-                        break;
-                    case 100:
-                        element.css("background-color", "#645452");
-                        break;
-                    default:
-                        element.css("background-color", "#FFFFFF");
-                        break;
-                }
+                const backgroundColor = valueToBackgroundColor[value] || valueToBackgroundColor.default;
+                element.css("background-color", backgroundColor);
             }
+
 
             // Function to format the date similar to toDateString
             function formatDateToDateString(date) {
@@ -14251,27 +14203,36 @@
             // Get all elements with class "kanji"
             var kanjiElements = document.querySelectorAll('.kanji');
 
-            // Define a function to handle the double-click event
+            // Define a function to handle the double-click event for toggling font
             function toggleFont(event) {
                 var element = event.target;
 
-                // Get the current font family
+                // Get the current font family and zoom value
                 var currentFontFamily = window.getComputedStyle(element).getPropertyValue('font-family');
+                var fontSizeMultiplier = $("#zoomSlider").val();
 
-                // Check if the font family is not "KanjiStrokeOrders"
-                if (currentFontFamily !== 'KanjiStrokeOrders') {
-                    element.style.fontSize = '12em';
-                    element.style.fontFamily = 'KanjiStrokeOrders';
-                } else {
-                    element.style.fontSize = '3em';
-                    element.style.fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif';
+                // Define the font size and font family based on the zoom value
+                var fontSize;
+                var fontFamily;
+
+                if (fontSizeMultiplier === "1") {
+                    fontSize = currentFontFamily !== 'KanjiStrokeOrders' ? '12em' : '3em';
+                    fontFamily = currentFontFamily !== 'KanjiStrokeOrders' ? 'KanjiStrokeOrders' : '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif';
+                } else if (fontSizeMultiplier === "0") {
+                    fontSize = currentFontFamily !== 'KanjiStrokeOrders' ? '12em' : '0.8em';
+                    fontFamily = currentFontFamily !== 'KanjiStrokeOrders' ? 'KanjiStrokeOrders' : '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif';
                 }
+
+                element.style.fontSize = fontSize;
+                element.style.fontFamily = fontFamily;
             }
+
 
             // Add a double-click event listener to each kanji element
             kanjiElements.forEach(function (element) {
                 element.addEventListener('dblclick', toggleFont);
             });
+
 
             var progress = (Object.keys(Failures).length / KanjiTotal) * 100;
 
