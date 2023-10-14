@@ -32,6 +32,10 @@
             margin-top: 1em;
         }
 
+        body{
+            margin-top: 0.5em;
+        }
+
         .divTableBody {
             display: table-row-group;
             display: flex;
@@ -83,11 +87,11 @@
 
         #fileSlider {
             margin-left: 1em;
-            margin-top: 1.5em;
             width: 80%;
             text-align: center;
             box-sizing: border-box;
             display: block;
+            margin-bottom: 1em;
         }
 
         .zoomContainer {
@@ -109,6 +113,25 @@
             box-sizing: border-box;
             margin-left: 1.5em;
             font-family: Verdana, sans-serif;
+            user-select: none;
+        }
+
+        .selectContainer {
+            margin: 0 auto;
+            width: 100px;
+            margin-right: 1em;
+            margin-top: -2.5em;
+            user-select: none;
+        }
+
+        #enableSelection {
+            position: relative;
+            box-sizing: border-box;
+
+        }
+
+        #enableSelectionLabel {
+            box-sizing: border-box;
         }
 
 
@@ -240,7 +263,7 @@
         #mySearch {
             position: absolute;
             left: 50vw;
-            top: 5em;
+            top: 4em;
             margin-left: -50px;
             /*half of width*/
             width: 10em;
@@ -250,7 +273,7 @@
             padding-left: 1%;
             padding-right: 1%;
             transition: width 0.4s ease-in-out;
-
+            user-select: none;
         }
 
         .progress_bg {
@@ -331,14 +354,20 @@
 
 
 
-
-    <input autocomplete="off" type="range" id="fileSlider" min="1" max="30" value="1">
     <span id="datasetDate">September 13, 2023</span>
+    <input autocomplete="off" type="range" id="fileSlider" min="1" max="30" value="1">
 
     <div class="zoomContainer">
         <input autocomplete="off" type="range" id="zoomSlider" min="0" max="1" step="1" value="1">
         <span id="ZoomLabel">Zoom</span>
+
     </div>
+
+    <div class="selectContainer">
+        <input autocomplete="off" type="checkbox" id="enableSelection">
+        <span id="enableSelectionLabel">Enable selection</span>
+    </div>
+
 
     <input id="mySearch" type="text" placeholder="Search...">
     <p style="text-align:center">
@@ -14262,7 +14291,14 @@
             // updateReadings();
 
 
+        const checkbox = document.getElementById("enableSelection");
 
+        checkbox.addEventListener("change", function () {
+            const userSelectValue = this.checked ? "text" : "none";
+            kanjiElements.forEach((element) => {
+                element.style.userSelect = userSelectValue;
+            });
+        });
 
 
 
