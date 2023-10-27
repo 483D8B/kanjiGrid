@@ -14338,40 +14338,6 @@
         });
 
 
-const slider = document.getElementById("fileSlider"); // Change to match your slider ID
-let touchStartX = 0;
-let touchStartTime = 0;
-const longPressDuration = 500; // Adjust as needed
-const step = 1; // Adjust the step size as needed
-
-slider.addEventListener("touchstart", function (e) {
-  touchStartX = e.touches[0].clientX;
-  touchStartTime = new Date().getTime();
-});
-
-slider.addEventListener("touchmove", function (e) {
-  e.preventDefault(); // Prevent scrolling while touching the slider
-});
-
-slider.addEventListener("touchend", function (e) {
-  const touchEndX = e.changedTouches[0].clientX;
-  const touchEndTime = new Date().getTime();
-  const touchDuration = touchEndTime - touchStartTime;
-
-  if (touchDuration >= longPressDuration) {
-    // Check if the touch was on the left or right side of the screen
-    const screenWidth = window.innerWidth;
-    const touchPosition = touchStartX / screenWidth;
-
-    if (touchPosition < 0.5) {
-      // Left side of the screen, move the slider left
-      slider.value = String(Math.max(Number(slider.value) - step, 1));
-    } else {
-      // Right side of the screen, move the slider right
-      slider.value = String(Math.min(Number(slider.value) + step, slider.max));
-    }
-  }
-});
 
 // Additional code for arrow key functionality
 document.addEventListener("keydown", function (event) {
