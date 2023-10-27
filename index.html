@@ -1,4 +1,4 @@
-<!-- version 4 14/10/2023 -->
+<!-- version 5 (redesign) 27/10/2023 -->
 <!DOCTYPE html>
 <html>
 
@@ -32,7 +32,7 @@
             margin-top: 1em;
         }
 
-        body{
+        body {
             margin-top: 0.5em;
         }
 
@@ -14060,7 +14060,7 @@
 
             // Define an object to map values to background colors
             const valueToBackgroundColor = {
-                1: "#C0C0C0",
+                1: "#FFFFFF",   //consider added as not studied for now for consistency(waiting to figure out how to handle it)
                 2: "#E67373",
                 3: "#E6C973",
                 4: "#ACE673",
@@ -14265,7 +14265,7 @@
 
             var progress = (Object.keys(Failures).length / KanjiTotal) * 100;
 
-            $(".progress_bar").css("width", progress.toFixed(2))
+            $(".progress_bar").css("width", progress.toFixed(2) + "%")
             $(".progress_perc").text(progress.toFixed(2) + "%")
 
 
@@ -14291,14 +14291,14 @@
             // updateReadings();
 
 
-        const checkbox = document.getElementById("enableSelection");
+            const checkbox = document.getElementById("enableSelection");
 
-        checkbox.addEventListener("change", function () {
-            const userSelectValue = this.checked ? "text" : "none";
-            kanjiElements.forEach((element) => {
-                element.style.userSelect = userSelectValue;
+            checkbox.addEventListener("change", function () {
+                const userSelectValue = this.checked ? "text" : "none";
+                kanjiElements.forEach((element) => {
+                    element.style.userSelect = userSelectValue;
+                });
             });
-        });
 
 
 
@@ -14336,6 +14336,62 @@
                 });
             }
         });
+
+
+const slider = document.getElementById("fileSlider"); // Change to match your slider ID
+let touchStartX = 0;
+let touchStartTime = 0;
+const longPressDuration = 500; // Adjust as needed
+const step = 1; // Adjust the step size as needed
+
+slider.addEventListener("touchstart", function (e) {
+  touchStartX = e.touches[0].clientX;
+  touchStartTime = new Date().getTime();
+});
+
+slider.addEventListener("touchmove", function (e) {
+  e.preventDefault(); // Prevent scrolling while touching the slider
+});
+
+slider.addEventListener("touchend", function (e) {
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndTime = new Date().getTime();
+  const touchDuration = touchEndTime - touchStartTime;
+
+  if (touchDuration >= longPressDuration) {
+    // Check if the touch was on the left or right side of the screen
+    const screenWidth = window.innerWidth;
+    const touchPosition = touchStartX / screenWidth;
+
+    if (touchPosition < 0.5) {
+      // Left side of the screen, move the slider left
+      slider.value = String(Math.max(Number(slider.value) - step, 1));
+    } else {
+      // Right side of the screen, move the slider right
+      slider.value = String(Math.min(Number(slider.value) + step, slider.max));
+    }
+  }
+});
+
+// Additional code for arrow key functionality
+document.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        const currentSliderValue = parseInt(slider.value);
+        let newSliderValue;
+
+        if (event.key === "ArrowLeft") {
+            newSliderValue = currentSliderValue - step;
+        } else if (event.key === "ArrowRight") {
+            newSliderValue = currentSliderValue + step;
+        }
+
+        // Ensure the newSliderValue is within a valid range (assuming 1 to max)
+        newSliderValue = Math.min(Math.max(1, newSliderValue), slider.max);
+
+        // Update the slider value
+        slider.value = String(newSliderValue);
+    }
+});
 
 
 
