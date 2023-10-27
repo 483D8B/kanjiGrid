@@ -333,17 +333,19 @@
         </div>
 
 
-
-
         <div class="settings-item">
-            <span class="keySettings" style="background-color: #645452; font-size: 0.91em;"> </span>
             <input type="checkbox" id="forgotten">&nbsp;
-            <label for="vehicle2">Forgotten</label><br>
+            Forgotten&nbsp;<span class="key" style="background-color: #a29897;"> </span><span class="key"
+                style="background-color: #645452;"> </span><span class="key"
+                style="background-color: #504342;"> </span><span class="key"
+                style="background-color: #322a29;"> </span><span class="key"
+                style="background-color: #282221;"> </span><span class="keySettings">
+                 </span>
         </div>
 
         <div class="settings-item">
-            <span class="keySettings" style="background-color: #C0C0C0; font-size: 0.91em;"> </span>
-            <label for="keySettings">Not added yet</label><br>
+            <!-- <span class="keySettings" style="background-color: #C0C0C0; font-size: 0.91em;"> </span>
+            <label for="keySettings">Not added yet</label><br> -->
         </div>
 
         <div class="settings-item">
@@ -14059,7 +14061,7 @@
 
 
             // Define an object to map values to background colors
-            const valueToBackgroundColor = {
+            const valueToBackgroundColorKanji = {
                 1: "#FFFFFF",   //consider added as not studied for now for consistency(waiting to figure out how to handle it)
                 2: "#E67373",
                 3: "#E6C973",
@@ -14073,13 +14075,27 @@
                 default: "#FFFFFF" // Default background color
             };
 
+
+            // Define an object to map Failures values to background colors for the "forgotten" state
+            const valueToBackgroundColorForgotten = {
+                1: "#a29897",
+                2: "#645452",
+                3: "#504342",
+                4: "#322a29",
+                default: "#282221"
+            };
+
+
             // Function to set background color based on value
             function setBackgroundColor(element, value) {
-                const backgroundColor = valueToBackgroundColor[value] || valueToBackgroundColor.default;
+                const backgroundColor = valueToBackgroundColorKanji[value] || valueToBackgroundColorKanji.default;
                 element.css("background-color", backgroundColor);
             }
 
-
+            // Function to map Failures values to background colors using the object
+            function getBackgroundColorForFailures(failures) {
+                return valueToBackgroundColorForgotten[failures] || valueToBackgroundColorForgotten.default;
+            }
             // Function to format the date similar to toDateString
             function formatDateToDateString(date) {
                 const months = [
@@ -14205,9 +14221,11 @@
                 if (forgottenCheckbox.checked) {
                     divTableCells.forEach(function (cell) {
                         var cellId = cell.id;
-                        if (Failures[cellId] > 1) {
+                        if (Failures[cellId] >= 1) {
+                            // Get the background color based on Failures value
+                            var backgroundColor = getBackgroundColorForFailures(Failures[cellId]);
                             // Overwrite the background color without resetting it
-                            cell.style.backgroundColor = "#645452";
+                            cell.style.backgroundColor = backgroundColor;
                         }
                     });
                 }
@@ -14339,25 +14357,26 @@
 
 
 
-// Additional code for arrow key functionality
-document.addEventListener("keydown", function (event) {
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-        const currentSliderValue = parseInt(slider.value);
-        let newSliderValue;
+        // Additional code for arrow key functionality
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+                const currentSliderValue = parseInt($("#fileSlider").val());
+                const step = 1; // Adjust the step size as needed
+                let newSliderValue;
 
-        if (event.key === "ArrowLeft") {
-            newSliderValue = currentSliderValue - step;
-        } else if (event.key === "ArrowRight") {
-            newSliderValue = currentSliderValue + step;
-        }
+                if (event.key === "ArrowLeft") {
+                    newSliderValue = currentSliderValue - step;
+                } else if (event.key === "ArrowRight") {
+                    newSliderValue = currentSliderValue + step;
+                }
 
-        // Ensure the newSliderValue is within a valid range (assuming 1 to max)
-        newSliderValue = Math.min(Math.max(1, newSliderValue), slider.max);
+                // Ensure the newSliderValue is within a valid range (assuming 1 to max)
+                newSliderValue = Math.min(Math.max(1, newSliderValue), $("#fileSlider").attr("max"));
 
-        // Update the slider value
-        slider.value = String(newSliderValue);
-    }
-});
+                // Update the slider value
+                $("#fileSlider").val(newSliderValue).trigger("input");
+            }
+        });
 
 
 
