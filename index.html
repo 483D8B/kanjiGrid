@@ -14331,40 +14331,46 @@
         $("#mySearch").focus();
         $("#mySearch").on("input", function () {
             var searchValue = $(this).val().toLowerCase();
-            var searchTerms = searchValue.split(/\s+/).filter(Boolean); // Split the input into individual terms
             var searchWords = searchValue.split(/\s+/).filter(Boolean); // Split the input into individual words
 
-            if (searchTerms.length === 0) {
-                // If no search terms are provided, show all sentences
+            if (searchWords.length === 0) {
+                // If no search words are provided, show all sentences
                 $(".divTableCell").show();
             } else {
                 var wholeWordFound = false;
 
-                // Create a regular expression to match whole words
-                var searchRegex = new RegExp("\\b" + searchWords.join("\\b|\\b") + "\\b", "i");
+                var alphanumericRegex = /[\da-zA-Z]+/;
 
                 $(".divTableCell").each(function () {
                     var cellText = $(this).text().toLowerCase();
-                    var termFound = false;
 
-                    // Check each search term in the cell text
-                    for (var i = 0; i < searchTerms.length; i++) {
-                        var term = searchTerms[i];
+                    // First, check for whole word matches
+                    var found = false;
 
-                        // Create a regular expression to match the exact term with word boundaries
-                        var regex = new RegExp("\\b" + term + "\\b", "i");
+                    for (var i = 0; i < searchWords.length; i++) {
+                        var word = searchWords[i];
 
-                        if (regex.test(cellText)) {
-                            termFound = true;
-                            break;
+                        if (alphanumericRegex.test(word)) {
+                            // Check if the word is alphanumeric
+                            var regex = new RegExp("\\b" + word + "\\b", "i");
+                            if (regex.test(cellText)) {
+                                found = true;
+                                break;
+                            }
+                        } else {
+                            // For non-alphanumeric words (e.g., kanji), check for partial matches
+                            if (cellText.includes(word)) {
+                                found = true;
+                                break;
+                            }
                         }
                     }
 
-                    // Toggle the visibility of the element based on whole word or kanji match
-                    $(this).toggle(termFound || searchRegex.test(cellText));
+                    // Toggle the visibility of the element based on the match
+                    $(this).toggle(found);
 
                     // Update the wholeWordFound flag
-                    if (termFound) {
+                    if (found) {
                         wholeWordFound = true;
                     }
                 });
@@ -14376,9 +14382,14 @@
                         var found = false;
 
                         for (var i = 0; i < searchWords.length; i++) {
-                            if (cellText.includes(searchWords[i])) {
-                                found = true;
-                                break;
+                            var word = searchWords[i];
+
+                            if (alphanumericRegex.test(word)) {
+                                // Check if the word is alphanumeric
+                                if (cellText.includes(word)) {
+                                    found = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -14388,16 +14399,6 @@
                 }
             }
         });
-
-
-
-
-
-
-
-
-
-
 
 
 
