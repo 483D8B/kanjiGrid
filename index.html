@@ -158,14 +158,14 @@
         input[type="range"]::-webkit-slider-thumb {
             /*  ...  */
             /*  slider progress trick  */
-            box-shadow: -407px 0 0 400px #3AA15B;
+            box-shadow: -100vw 0 0 100vw #3AA15B;
         }
 
         /* Thumb: Firefox */
         input[type="range"]::-moz-range-thumb {
             /*  ...  */
             /*  slider progress trick  */
-            box-shadow: -407px 0 0 400px #3AA15B;
+            box-shadow: -100vw 0 0 100vw #3AA15B;
         }
 
         .zoomContainer {
@@ -14475,52 +14475,34 @@
                 var searchValue = $(this).val().toLowerCase();
                 var searchWords = searchValue.split(/\s+/).filter(Boolean); // Split the input into individual words
 
-                if (searchWords.length === 0) {
-                    const divTableCells = document.querySelectorAll(".divTableCell");
-                    // If no search words are provided, show all sentences
-                    for (const cell of divTableCells) {
-                        cell.style.display = "block";
-                    }
-                } else {
-                    var wholeWordFound = false;
-                    var alphanumericRegex = /[\da-zA-Z]+/;
-
+                // Check if the user entered "-failed" in the search
+                if (searchWords.includes("-failed")) {
+                    // Toggle visibility based on Failures object
                     $(".divTableCell").each(function () {
-                        var cellText = $(this).text().toLowerCase();
-                        // First, check for whole word matches
-                        var found = false;
-
-                        for (var i = 0; i < searchWords.length; i++) {
-                            var word = searchWords[i];
-
-                            if (alphanumericRegex.test(word)) {
-                                // Check if the word is alphanumeric
-                                var regex = new RegExp("\\b" + word + "\\b", "i");
-                                if (regex.test(cellText)) {
-                                    found = true;
-                                    break;
-                                }
-                            } else {
-                                // For non-alphanumeric words (e.g., kanji), check for partial matches
-                                if (cellText.includes(word)) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-                        // Toggle the visibility of the element based on the match
-                        $(this).toggle(found);
-
-                        // Update the wholeWordFound flag
-                        if (found) {
-                            wholeWordFound = true;
+                        var framenr = $(this).find('.framenr').text();
+                        var failuresValue = Failures[framenr] || 0;
+                        $(this).toggle(failuresValue > 0);
+                        // Check if the failure-value class is already present
+                        if (!$(this).hasClass('failure-value')) {
+                            // Add the class and append the value
+                            $(this).addClass('failure-value').append("<div class='failure-value'>" + failuresValue + "</div>");
                         }
                     });
+                } else {
 
-                    if (!wholeWordFound) {
-                        // If no whole word matches were found, show partial matches
+                    if (searchWords.length === 0) {
+                        const divTableCells = document.querySelectorAll(".divTableCell");
+                        // If no search words are provided, show all sentences
+                        for (const cell of divTableCells) {
+                            cell.style.display = "block";
+                        }
+                    } else {
+                        var wholeWordFound = false;
+                        var alphanumericRegex = /[\da-zA-Z]+/;
+
                         $(".divTableCell").each(function () {
                             var cellText = $(this).text().toLowerCase();
+                            // First, check for whole word matches
                             var found = false;
 
                             for (var i = 0; i < searchWords.length; i++) {
@@ -14528,15 +14510,49 @@
 
                                 if (alphanumericRegex.test(word)) {
                                     // Check if the word is alphanumeric
+                                    var regex = new RegExp("\\b" + word + "\\b", "i");
+                                    if (regex.test(cellText)) {
+                                        found = true;
+                                        break;
+                                    }
+                                } else {
+                                    // For non-alphanumeric words (e.g., kanji), check for partial matches
                                     if (cellText.includes(word)) {
                                         found = true;
                                         break;
                                     }
                                 }
                             }
-                            // Toggle the visibility of the element based on partial match
+                            // Toggle the visibility of the element based on the match
                             $(this).toggle(found);
+
+                            // Update the wholeWordFound flag
+                            if (found) {
+                                wholeWordFound = true;
+                            }
                         });
+
+                        if (!wholeWordFound) {
+                            // If no whole word matches were found, show partial matches
+                            $(".divTableCell").each(function () {
+                                var cellText = $(this).text().toLowerCase();
+                                var found = false;
+
+                                for (var i = 0; i < searchWords.length; i++) {
+                                    var word = searchWords[i];
+
+                                    if (alphanumericRegex.test(word)) {
+                                        // Check if the word is alphanumeric
+                                        if (cellText.includes(word)) {
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                // Toggle the visibility of the element based on partial match
+                                $(this).toggle(found);
+                            });
+                        }
                     }
                 }
             });
@@ -14565,6 +14581,8 @@
                 // Clear the input field
                 $searchInput.val("");
 
+
+                $(".divTableCell .failure-value").remove();
                 // Show all .divTableCell elements
                 const divTableCells = document.querySelectorAll(".divTableCell");
                 for (const cell of divTableCells) {
