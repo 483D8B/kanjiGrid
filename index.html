@@ -1,12 +1,12 @@
-<!-- version 5 (redesign) 13/11/2023 -->
+<!-- version 6 (optimized and new search bar + custom checkbox and slider) 14/11/2023 -->
 <!DOCTYPE html>
 <html>
+<!-- https://moderncss.dev/pure-css-custom-checkbox-style/ -->
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- <script src="leitner.js"></script> -->
     <script src="https://483d8b.pythonanywhere.com/leitner.js"></script>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
@@ -25,7 +25,16 @@
             box-sizing: border-box;
         }
 
-        /* Your style here*/
+        ::-moz-selection {
+            /* Code for Firefox */
+            color: white;
+            background: #A06D7F;
+        }
+
+        ::selection {
+            color: white;
+            background: #A06D7F;
+        }
 
         .divTable {
             display: table;
@@ -94,6 +103,71 @@
             margin-bottom: 1em;
         }
 
+        input[type="range"] {
+            /* removing default appearance */
+            -webkit-appearance: none;
+            appearance: none;
+            /* creating a custom design */
+            width: 100%;
+            height: 15px;
+            cursor: pointer;
+            outline: none;
+            background: #A06D7F;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        /* Track: webkit browsers */
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 5px;
+            background: #A06D7F;
+            border-radius: 16px;
+        }
+
+        /* Track: Mozilla Firefox */
+        input[type="range"]::-moz-range-track {
+            height: 5px;
+            background: #A06D7F;
+            border-radius: 16px;
+        }
+
+        /* Thumb: webkit */
+        input[type="range"]::-webkit-slider-thumb {
+            /* removing default appearance */
+            -webkit-appearance: none;
+            appearance: none;
+            /* creating a custom design */
+            height: 10px;
+            width: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            border: 2px solid black;
+        }
+
+        /* Thumb: Firefox */
+        input[type="range"]::-moz-range-thumb {
+            height: 10px;
+            width: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            border: 2px solid black;
+        }
+
+        /* Thumb: webkit */
+        input[type="range"]::-webkit-slider-thumb {
+            /*  ...  */
+            /*  slider progress trick  */
+            box-shadow: -407px 0 0 400px #3AA15B;
+        }
+
+        /* Thumb: Firefox */
+        input[type="range"]::-moz-range-thumb {
+            /*  ...  */
+            /*  slider progress trick  */
+            box-shadow: -407px 0 0 400px #3AA15B;
+        }
+
         .zoomContainer {
             margin: 0 auto;
             width: 100px;
@@ -117,21 +191,77 @@
         }
 
         .selectContainer {
-            margin: 0 auto;
-            width: 70px;
-            margin-right: 1em;
-            margin-top: -2.5em;
-            user-select: none;
+            display: flex;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid black;
+            font-family: Verdana, sans-serif;
+            font-size: 1em;
         }
 
         #enableSelection {
             position: relative;
-            box-sizing: border-box;
-
         }
 
         #enableSelectionLabel {
             box-sizing: border-box;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            vertical-align: middle;
+            appearance: none;
+            background-color: #A06D7F;
+            margin: 0;
+            font: inherit;
+            color: black;
+            width: 1.15em;
+            height: 1.15em;
+            border: 0.15em solid black;
+            border-radius: 0.15em;
+            transform: translateY(-0.075em);
+            place-content: center;
+            display: grid;
+        }
+
+        input[type="checkbox"]::before {
+            content: "";
+            width: 1em;
+            height: 1em;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            transform: scale(0);
+            transform-origin: bottom left;
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: #000000;
+        }
+
+        input[type="checkbox"]:focus {
+            outline: max(2px, 0.15em) solid currentColor;
+            outline-offset: max(2px, 0.15em);
+        }
+
+        input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+
+        .form-control {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 1em;
+            line-height: 1.5;
+            font-weight: 700;
+            display: grid;
+            grid-template-columns: 1em auto;
+            gap: 5em;
+        }
+
+        .form-control+.form-control {
+            margin-top: 1em;
+        }
+
+        .settings-item input {
+            width: 30px;
+            height: 30px;
         }
 
 
@@ -187,9 +317,7 @@
         .settings-popup {
             position: fixed;
             width: 70vw;
-            /* Set the width of the popup window */
-            height: 45vh;
-            /* Set the height of the popup window */
+            height: 60vh;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -202,26 +330,20 @@
             opacity: 0.95;
             font-family: Verdana, sans-serif;
             flex-direction: column;
-            /* Stack items vertically */
             align-items: center;
-            /* Center items horizontally */
         }
 
         .settings-item {
             display: flex;
-            /* Use flexbox to keep label and content on the same line */
             font-family: Verdana, sans-serif;
             font-size: large;
             justify-content: center;
             text-align: center;
-            /* Center text horizontally */
             margin: 10px 0;
-            /* Add some margin between items */
         }
 
         .settings-item label {
-            margin-right: 0;
-            /* Add spacing between label and content div */
+            margin-right: 20px;
         }
 
         #close-settings-btn {
@@ -250,30 +372,19 @@
         }
 
         #showKeyword {
-            background-color: silver;
+            background-color: #A06D7F;
             border-radius: 15px;
+            border: 2px solid black;
             margin-right: 5px;
-            /* Add margin-right to position it on the right */
             float: right;
-            /* Add float: right; to move it to the right */
             padding: 5px;
             font-family: Verdana, sans-serif;
+            color: white;
+            font-size: 1em;
         }
 
-        #mySearch {
-            position: absolute;
-            left: 50vw;
-            top: 4em;
-            margin-left: -50px;
-            /*half of width*/
-            width: 10em;
-            background-color: whitesmoke;
-            color: black;
-            border-radius: 15px;
-            padding-left: 1%;
-            padding-right: 1%;
-            transition: width 0.4s ease-in-out;
-            user-select: none;
+        #showKeyword:active {
+            background-color: #8d5869;
         }
 
         .progress_bg {
@@ -307,6 +418,100 @@
             font-weight: 700;
             font-family: Verdana, sans-serif;
         }
+
+        /*search bar style*/
+
+        #mySearch {
+            background-color: #A06D7F;
+            color: white;
+            font-family: Verdana, sans-serif;
+            font-size: 1em;
+        }
+
+        .search-box {
+            left: 50vw;
+            margin-left: -60px;
+            top: 3em;
+            border: solid 3px #000000;
+            display: inline-block;
+            position: absolute;
+            border-radius: 2.5em;
+        }
+
+        .search-box label {
+            position: absolute;
+            left: 100%;
+            margin-left: 1em;
+            top: 20%;
+            font-family: Verdana, sans-serif;
+            color: #a29897;
+        }
+
+        .search-box input[type="text"] {
+            font-family: inherit;
+            font-weight: bold;
+            width: 2em;
+            height: 2em;
+            padding: 0.7em 1.5em 0.7em 0.5em;
+            border: none;
+            box-sizing: border-box;
+            border-radius: 2.5em;
+            transition: width 200ms cubic-bezier(0.68, -0.55, 0.27, 1.55) 150ms;
+        }
+
+        .search-box input[type="text"]:focus {
+            outline: none;
+        }
+
+        .search-box input[type="text"]:focus,
+        .search-box input[type="text"]:not(:placeholder-shown) {
+            width: 10em;
+            transition: width 200ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .search-box input[type="text"]:focus+button[type="reset"],
+        .search-box input[type="text"]:not(:placeholder-shown)+button[type="reset"] {
+            transform: rotate(-45deg) translateY(0);
+            transition: transform 150ms ease-out 200ms;
+        }
+
+        .search-box input[type="text"]:focus+button[type="reset"]:after,
+        .search-box input[type="text"]:not(:placeholder-shown)+button[type="reset"]:after {
+            opacity: 1;
+            transition: top 150ms ease-out 250ms, right 150ms ease-out 250ms, opacity 150ms ease 250ms;
+        }
+
+        .search-box button[type="reset"] {
+            background-color: transparent;
+            width: 1.4em;
+            height: 1.4em;
+            border: 0;
+            padding: 0;
+            outline: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0.55em;
+            right: 0.55em;
+            transform: rotate(-45deg) translateY(1.8em);
+            transition: transform 150ms ease-out 150ms;
+        }
+
+        .search-box button[type="reset"]:before,
+        .search-box button[type="reset"]:after {
+            content: "";
+            background-color: #000;
+            width: 3px;
+            height: 1em;
+            position: absolute;
+        }
+
+        .search-box button[type="reset"]:after {
+            transform: rotate(90deg);
+            opacity: 0;
+            transition: transform 150ms ease-out, opacity 150ms ease-out;
+        }
     </style>
 </head>
 
@@ -334,8 +539,12 @@
 
 
         <div class="settings-item">
-            <input type="checkbox" id="forgotten">&nbsp;
-            Forgotten&nbsp;<span class="key" style="background-color: #a29897;"> </span><span class="key"
+
+            <label class="form-control">Forgotten
+                <input type="checkbox" id="forgotten">
+            </label>
+
+            <span class="key" style="background-color: #a29897;"> </span><span class="key"
                 style="background-color: #645452;"> </span><span class="key"
                 style="background-color: #504342;"> </span><span class="key"
                 style="background-color: #322a29;"> </span><span class="key"
@@ -344,8 +553,10 @@
         </div>
 
         <div class="settings-item">
-            <!-- <span class="keySettings" style="background-color: #C0C0C0; font-size: 0.91em;"> </span>
-            <label for="keySettings">Not added yet</label><br> -->
+            <div class="selectContainer">
+                <label for="enableSelection">Enable kanji selection</label>
+                <input autocomplete="off" type="checkbox" id="enableSelection">
+            </div>
         </div>
 
         <div class="settings-item">
@@ -365,13 +576,12 @@
 
     </div>
 
-    <div class="selectContainer">
-        <input autocomplete="off" type="checkbox" id="enableSelection">
-        <span id="enableSelectionLabel">Enable selection</span>
-    </div>
-
-
-    <input id="mySearch" type="text" placeholder="Search...">
+    <form class="search-box">
+        <label for="mySearch">Search</label>
+        <input id="mySearch" type="text" placeholder="" />
+        <button id="deleteSearch" type="reset"></button>
+    </form>
+    <!-- <input id="mySearch" type="text" placeholder="Search..."> -->
     <p style="text-align:center">
         Weak&nbsp;<span class="key" style="background-color: #E67373;"> </span><span class="key"
             style="background-color: #E6C973;"> </span><span class="key"
@@ -14037,18 +14247,61 @@
     <script>
         // Your script here
 
+        // Define the updateDateDisplay function globally
+        function updateDateDisplay(selectedDataset) {
+            const dateElement = $("#datasetDate");
+            const datasetDates = Object.keys(leitnerData).map(dataset => ({
+                name: dataset,
+                date: dataset.replace("koohii_", "")
+            }));
+
+            const selectedDateObj = datasetDates.find(datasetObj => datasetObj.name === selectedDataset);
+            var dateText;
+            if (selectedDateObj.date == "origin")
+                dateText = "Slide to see progress"
+            else
+                dateText = selectedDateObj ? `${formatDateToDateString(new Date(selectedDateObj.date))}` : "No data ( •_•)";
+
+            dateElement.text(dateText);
+        }
+        // Function to format the date similar to toDateString
+        function formatDateToDateString(date) {
+            const months = [
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            ];
+            const year = date.getFullYear();
+            const month = months[date.getMonth()];
+            const day = date.getDate();
+            return `${month} ${day}, ${year}`;
+        }
+
+        // Function to map Failures values to background colors using the object
+        function getBackgroundColorForFailures(failures) {
+            const valueToBackgroundColorForgotten = {
+                1: "#a29897",
+                2: "#645452",
+                3: "#504342",
+                4: "#322a29",
+                default: "#282221"
+            };
+
+            return valueToBackgroundColorForgotten[failures] || valueToBackgroundColorForgotten.default;
+        }
+
+
+
         $(document).ready(function () {
-
-
             const KanjiTotal = 2273;
-
-
-            //STARTING REPLACE FROM HERE
-
-
-
-            //ENDING REPLACE HERE
-
+            const $fileSlider = $("#fileSlider");
+            const $zoomSlider = $("#zoomSlider");
+            const $settings = $('#settings');
+            const $closeSettingsBtn = $('#close-settings-btn');
+            const $forgottenCheckbox = document.getElementById("forgotten");
+            const $showKeyword = $("#showKeyword");
+            const $enableSelectionCheckbox = document.getElementById("enableSelection");
+            const $searchInput = $("#mySearch"); // Define $searchInput as a jQuery object
+            const $deleteButton = $("#deleteSearch"); // Define $deleteButton as a jQuery object
 
             const Readings = { 1: 3 }
 
@@ -14060,9 +14313,9 @@
             $("#fileSlider").attr("max", numberOfDatasets);
 
 
-            // Define an object to map values to background colors
+            // Define constants for background colors
             const valueToBackgroundColorKanji = {
-                1: "#FFFFFF",   //consider added as not studied for now for consistency(waiting to figure out how to handle it)
+                1: "#FFFFFF", //consider added as not studied for now for consistency(waiting to figure out how to handle it)
                 2: "#E67373",
                 3: "#E6C973",
                 4: "#ACE673",
@@ -14072,11 +14325,9 @@
                 8: "#AC73E6",
                 9: "#EE82EE",
                 100: "#645452",
-                default: "#FFFFFF" // Default background color
+                default: "#FFFFFF"  // Default background color
             };
 
-
-            // Define an object to map Failures values to background colors for the "forgotten" state
             const valueToBackgroundColorForgotten = {
                 1: "#a29897",
                 2: "#645452",
@@ -14085,182 +14336,43 @@
                 default: "#282221"
             };
 
-
-            // Function to set background color based on value
+            // Set the initial background color
             function setBackgroundColor(element, value) {
                 const backgroundColor = valueToBackgroundColorKanji[value] || valueToBackgroundColorKanji.default;
                 element.css("background-color", backgroundColor);
             }
 
-            // Function to map Failures values to background colors using the object
-            function getBackgroundColorForFailures(failures) {
-                return valueToBackgroundColorForgotten[failures] || valueToBackgroundColorForgotten.default;
-            }
-            // Function to format the date similar to toDateString
-            function formatDateToDateString(date) {
-                const months = [
-                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-                ];
-                const year = date.getFullYear();
-                const month = months[date.getMonth()];
-                const day = date.getDate();
-                return `${month} ${day}, ${year}`;
-            }
-
-            // Function to update the date display
-            function updateDateDisplay(selectedDataset) {
-                const dateElement = $("#datasetDate");
-                const datasetDates = Object.keys(leitnerData).map(dataset => ({
-                    name: dataset,
-                    date: dataset.replace("koohii_", "")
-                }));
-
-                const selectedDateObj = datasetDates.find(datasetObj => datasetObj.name === selectedDataset);
-                var dateText;
-                if (selectedDateObj.date == "origin")
-                    dateText = "Slide to see progress"
-                else
-                    dateText = selectedDateObj ? `${formatDateToDateString(new Date(selectedDateObj.date))}` : "No data ( •_•)";
-
-                dateElement.text(dateText);
-            }
-
-            // Slider change event
-            $("#fileSlider").on("input", function () {
-                const sliderValue = $(this).val();
-                const datasetKeys = Object.keys(leitnerData);
-
-                // Ensure sliderValue is within a valid range
-                const clampedValue = Math.min(Math.max(1, sliderValue), datasetKeys.length);
-
-                // Calculate the index based on clamped sliderValue
-                const datasetIndex = clampedValue - 1;
-
-                const selectedDataset = datasetKeys[datasetIndex];
-
-
-                // Update the date display
-                updateDateDisplay(selectedDataset);
-
-                // Iterate through each divTableCell
-                $(".divTableCell").each(function () {
-                    const id = $(this).attr("id");
-
-                    // Check if the id exists in the selected dataset
-                    if (leitnerData[selectedDataset] && leitnerData[selectedDataset].hasOwnProperty(id)) {
-                        const value = leitnerData[selectedDataset][id];
-                        setBackgroundColor($(this), value);
-                    } else {
-                        // If the id doesn't exist in the selected dataset, set background color to white
-                        $(this).css("background-color", "white");
-                    }
-                });
-            });
-
-            // Initialize with the default slider value and dataset
-            let initialSliderValue = 1;
-            const datasetKeys = Object.keys(leitnerData);
-            let initialDataset = datasetKeys[0]; // Start with the first dataset
-
-            // Initialize the date display
-            updateDateDisplay(initialDataset);
-
-            // Iterate through each divTableCell and set the initial background color
-            $(".divTableCell").each(function () {
-                const id = $(this).attr("id");
-
-                // Check if the id exists in the initial dataset
-                if (leitnerData[initialDataset] && leitnerData[initialDataset].hasOwnProperty(id)) {
-                    const value = leitnerData[initialDataset][id];
-                    setBackgroundColor($(this), value);
-                } else {
-                    // If the id doesn't exist in the initial dataset, set background color to white
-                    $(this).css("background-color", "white");
-                }
-            });
-
-            $("#zoomSlider").on("input", function () {
-                const fontSizeMultiplier = $(this).val();
-                const kanjiFontSize = fontSizeMultiplier === "1" ? "3em" : "0.80em";
-                const framenrFontSize = fontSizeMultiplier === "1" ? "1em" : "0em";
-
-                if (fontSizeMultiplier === "0") {
-                    $(".divTableCell").css("border", "silver solid 1px");
-                    $(".divTableCell").css("padding-left", "5px");
-                    $(".divTableCell").css("padding-right", "5px");
-                }
-                else {
-                    $(".divTableCell").css("border", "black solid 1px");
-                    $(".divTableCell").css("padding-left", "1px");
-                    $(".divTableCell").css("padding-right", "1px");
-                }
-
-
-
-                $(".kanji").css("font-size", kanjiFontSize);
-                $(".framenr").css("font-size", framenrFontSize);
-            });
-
-
-            $('#settings').on('click', function () {
-                $('#settings-popup').show(); // Show the settings popup
-            });
-            $('#close-settings-btn').on('click', function () {
-                $('#settings-popup').hide(); // Hide the settings popup when the close button (X) is clicked
-                var forgottenCheckbox = document.getElementById("forgotten");
-                forgottenCheckbox.checked = false;
-            });
-
-
-            // Function to update cell colors based on Failures object
+            // Update cell colors based on the Failures object
             function updateForgotten() {
-                var forgottenCheckbox = document.getElementById("forgotten");
-                var divTableCells = document.querySelectorAll(".divTableCell");
-
-                if (forgottenCheckbox.checked) {
-                    divTableCells.forEach(function (cell) {
-                        var cellId = cell.id;
+                const divTableCells = document.querySelectorAll(".divTableCell");
+                if ($forgottenCheckbox.checked) {
+                    divTableCells.forEach((cell) => {
+                        const cellId = cell.id;
                         if (Failures[cellId] >= 1) {
-                            // Get the background color based on Failures value
-                            var backgroundColor = getBackgroundColorForFailures(Failures[cellId]);
-                            // Overwrite the background color without resetting it
-                            cell.style.backgroundColor = backgroundColor;
+                            cell.style.backgroundColor = getBackgroundColorForFailures(Failures[cellId]);
                         }
                     });
                 }
             }
 
             // Add an event listener to the "forgotten" checkbox
-            var forgottenCheckbox = document.getElementById("forgotten");
-            forgottenCheckbox.addEventListener("change", updateForgotten);
+            $forgottenCheckbox.addEventListener("change", updateForgotten);
 
-            // Initial call to set cell colors based on the checkbox state
-            updateForgotten();
-
-
-            $("#showKeyword").click(function () {
-                var cells = $(".keyword");
-                cells.each(function (i) {
-                    cells.eq(i).toggle();
-                });
+            // Toggle visibility of keyword cells
+            $showKeyword.click(function () {
+                $(".keyword").toggle();
             });
 
-
             // Get all elements with class "kanji"
-            var kanjiElements = document.querySelectorAll('.kanji');
+            const kanjiElements = document.querySelectorAll('.kanji');
 
-            // Define a function to handle the double-click event for toggling font
+            // Handle double-click event for toggling font
             function toggleFont(event) {
-                var element = event.target;
-
-                // Get the current font family and zoom value
-                var currentFontFamily = window.getComputedStyle(element).getPropertyValue('font-family');
-                var fontSizeMultiplier = $("#zoomSlider").val();
-
-                // Define the font size and font family based on the zoom value
-                var fontSize;
-                var fontFamily;
+                const element = event.target;
+                const currentFontFamily = window.getComputedStyle(element).getPropertyValue('font-family');
+                const fontSizeMultiplier = $zoomSlider.val();
+                let fontSize;
+                let fontFamily;
 
                 if (fontSizeMultiplier === "1") {
                     fontSize = currentFontFamily !== 'KanjiStrokeOrders' ? '12em' : '3em';
@@ -14274,111 +14386,105 @@
                 element.style.fontFamily = fontFamily;
             }
 
-
             // Add a double-click event listener to each kanji element
             kanjiElements.forEach(function (element) {
                 element.addEventListener('dblclick', toggleFont);
             });
 
+            // Update progress bar
+            const progress = (Object.keys(Failures).length / KanjiTotal) * 100;
+            $(".progress_bar").css("width", progress.toFixed(2) + "%");
+            $(".progress_perc").text(progress.toFixed(2) + "%");
 
-            var progress = (Object.keys(Failures).length / KanjiTotal) * 100;
-
-            $(".progress_bar").css("width", progress.toFixed(2) + "%")
-            $(".progress_perc").text(progress.toFixed(2) + "%")
-
-
-
-
-            //             // Function to update cell borders based on ON and KUN knowledge
-            //             function updateReadings() {
-
-            //     var divTableCells = document.querySelectorAll(".divTableCell");
-
-            //         divTableCells.forEach(function (cell) {
-            //             var cellId = cell.id;
-            //             if (Readings[cellId] > 1) {
-            //                 // Overwrite the background color without resetting it
-            //                 cell.style.border = "2px solid #0000FF"; 
-            //             }
-            //         });
-
-            // }
-
-
-            // // Initial call to set cell colors based on the checkbox state
-            // updateReadings();
-
-
-            const checkbox = document.getElementById("enableSelection");
-
-            checkbox.addEventListener("change", function () {
+            // Add an event listener to the "enableSelection" checkbox
+            $enableSelectionCheckbox.addEventListener("change", function () {
                 const userSelectValue = this.checked ? "text" : "none";
                 kanjiElements.forEach((element) => {
                     element.style.userSelect = userSelectValue;
                 });
             });
 
+            // Handle slider change event
+            $fileSlider.on("input", function () {
+                const sliderValue = $(this).val();
+                const datasetKeys = Object.keys(leitnerData);
 
+                const clampedValue = Math.min(Math.max(1, sliderValue), datasetKeys.length);
+                const datasetIndex = clampedValue - 1;
+                const selectedDataset = datasetKeys[datasetIndex];
 
-
-
-        });  //end doc ready
-
-        function myFunction(val) {
-            document.getElementById("dateDisplay").innerHTML = val;
-        }
-
-        $("#mySearch").focus();
-        $("#mySearch").on("input", function () {
-            var searchValue = $(this).val().toLowerCase();
-            var searchWords = searchValue.split(/\s+/).filter(Boolean); // Split the input into individual words
-
-            if (searchWords.length === 0) {
-                // If no search words are provided, show all sentences
-                $(".divTableCell").show();
-            } else {
-                var wholeWordFound = false;
-
-                var alphanumericRegex = /[\da-zA-Z]+/;
+                updateDateDisplay(selectedDataset);
 
                 $(".divTableCell").each(function () {
-                    var cellText = $(this).text().toLowerCase();
-
-                    // First, check for whole word matches
-                    var found = false;
-
-                    for (var i = 0; i < searchWords.length; i++) {
-                        var word = searchWords[i];
-
-                        if (alphanumericRegex.test(word)) {
-                            // Check if the word is alphanumeric
-                            var regex = new RegExp("\\b" + word + "\\b", "i");
-                            if (regex.test(cellText)) {
-                                found = true;
-                                break;
-                            }
-                        } else {
-                            // For non-alphanumeric words (e.g., kanji), check for partial matches
-                            if (cellText.includes(word)) {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    // Toggle the visibility of the element based on the match
-                    $(this).toggle(found);
-
-                    // Update the wholeWordFound flag
-                    if (found) {
-                        wholeWordFound = true;
+                    const id = $(this).attr("id");
+                    if (leitnerData[selectedDataset] && leitnerData[selectedDataset].hasOwnProperty(id)) {
+                        const value = leitnerData[selectedDataset][id];
+                        setBackgroundColor($(this), value);
+                    } else {
+                        $(this).css("background-color", "white");
                     }
                 });
+            });
 
-                if (!wholeWordFound) {
-                    // If no whole word matches were found, show partial matches
+            // Initialize the date display and initial cell colors
+            let initialSliderValue = 1;
+            const datasetKeys = Object.keys(leitnerData);
+            let initialDataset = datasetKeys[0];
+            updateDateDisplay(initialDataset);
+
+            // Handle zoom slider change event
+            $zoomSlider.on("input", function () {
+                const fontSizeMultiplier = $(this).val();
+                const kanjiFontSize = fontSizeMultiplier === "1" ? "3em" : "0.80em";
+                const framenrFontSize = fontSizeMultiplier === "1" ? "1em" : "0em";
+
+                if (fontSizeMultiplier === "0") {
+                    $(".divTableCell").css({
+                        'border': 'silver solid 1px',
+                        'padding-left': '5px',
+                        'padding-right': '5px'
+                    });
+                } else {
+                    $(".divTableCell").css({
+                        'border': 'black solid 1px',
+                        'padding-left': '1px',
+                        'padding-right': '1px'
+                    });
+                }
+
+                $(".kanji").css("font-size", kanjiFontSize);
+                $(".framenr").css("font-size", framenrFontSize);
+            });
+
+            // Handle settings and close settings button click events
+            $settings.on('click', function () {
+                $('#settings-popup').show();
+            });
+
+            $closeSettingsBtn.on('click', function () {
+                $('#settings-popup').hide();
+                $forgottenCheckbox.checked = false;
+            });
+
+
+            $searchInput.focus()
+            $searchInput.on("input", function () {
+                var searchValue = $(this).val().toLowerCase();
+                var searchWords = searchValue.split(/\s+/).filter(Boolean); // Split the input into individual words
+
+                if (searchWords.length === 0) {
+                    const divTableCells = document.querySelectorAll(".divTableCell");
+                    // If no search words are provided, show all sentences
+                    for (const cell of divTableCells) {
+                        cell.style.display = "block";
+                    }
+                } else {
+                    var wholeWordFound = false;
+                    var alphanumericRegex = /[\da-zA-Z]+/;
+
                     $(".divTableCell").each(function () {
                         var cellText = $(this).text().toLowerCase();
+                        // First, check for whole word matches
                         var found = false;
 
                         for (var i = 0; i < searchWords.length; i++) {
@@ -14386,44 +14492,83 @@
 
                             if (alphanumericRegex.test(word)) {
                                 // Check if the word is alphanumeric
+                                var regex = new RegExp("\\b" + word + "\\b", "i");
+                                if (regex.test(cellText)) {
+                                    found = true;
+                                    break;
+                                }
+                            } else {
+                                // For non-alphanumeric words (e.g., kanji), check for partial matches
                                 if (cellText.includes(word)) {
                                     found = true;
                                     break;
                                 }
                             }
                         }
-
-                        // Toggle the visibility of the element based on partial match
+                        // Toggle the visibility of the element based on the match
                         $(this).toggle(found);
+
+                        // Update the wholeWordFound flag
+                        if (found) {
+                            wholeWordFound = true;
+                        }
                     });
+
+                    if (!wholeWordFound) {
+                        // If no whole word matches were found, show partial matches
+                        $(".divTableCell").each(function () {
+                            var cellText = $(this).text().toLowerCase();
+                            var found = false;
+
+                            for (var i = 0; i < searchWords.length; i++) {
+                                var word = searchWords[i];
+
+                                if (alphanumericRegex.test(word)) {
+                                    // Check if the word is alphanumeric
+                                    if (cellText.includes(word)) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            // Toggle the visibility of the element based on partial match
+                            $(this).toggle(found);
+                        });
+                    }
                 }
-            }
-        });
+            });
 
+            // Handle arrow key functionality
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+                    const currentSliderValue = parseInt($fileSlider.val());
+                    const step = 1;
+                    let newSliderValue;
 
-
-
-        // Additional code for arrow key functionality
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-                const currentSliderValue = parseInt($("#fileSlider").val());
-                const step = 1; // Adjust the step size as needed
-                let newSliderValue;
-
-                if (event.key === "ArrowLeft") {
-                    newSliderValue = currentSliderValue - step;
-                } else if (event.key === "ArrowRight") {
-                    newSliderValue = currentSliderValue + step;
+                    if (event.key === "ArrowLeft") {
+                        newSliderValue = currentSliderValue - step;
+                    } else if (event.key === "ArrowRight") {
+                        newSliderValue = currentSliderValue + step;
+                    }
+                    // Ensure the newSliderValue is within a valid range (assuming 1 to max)
+                    newSliderValue = Math.min(Math.max(1, newSliderValue), $fileSlider.attr("max"));
+                    // Update the slider value
+                    $fileSlider.val(newSliderValue).trigger("input");
                 }
+            });
 
-                // Ensure the newSliderValue is within a valid range (assuming 1 to max)
-                newSliderValue = Math.min(Math.max(1, newSliderValue), $("#fileSlider").attr("max"));
+            // Add a click event listener to the delete button
+            $deleteButton.on("click", function () {
+                // Clear the input field
+                $searchInput.val("");
 
-                // Update the slider value
-                $("#fileSlider").val(newSliderValue).trigger("input");
-            }
-        });
-
+                // Show all .divTableCell elements
+                const divTableCells = document.querySelectorAll(".divTableCell");
+                for (const cell of divTableCells) {
+                    cell.style.display = "block"; // Or whatever the initial display value should be
+                }
+            });
+        });  //end doc ready
 
 
     </script>
