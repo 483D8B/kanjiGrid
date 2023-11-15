@@ -328,7 +328,6 @@
             left: 50%;
             padding: 2%;
             transform: translate(-50%, -50%);
-            padding-top: 5%;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 2px;
@@ -355,9 +354,9 @@
         }
 
         #close-settings-btn {
-            position: absolute;
+            position: sticky;
             top: 0;
-            right: 0;
+            left: 97%;
             height: auto;
             width: auto;
             font-size: 200%;
@@ -365,8 +364,6 @@
             font-weight: 900;
             background-color: transparent;
             border: 1px solid transparent;
-            margin-top: -5px;
-            margin-right: 5px;
         }
 
         .keySettings {
@@ -535,6 +532,25 @@
             border: 2px solid black;
             text-align: center;
         }
+
+        #stats {
+            border: 2px solid black;
+            padding: 5px;
+            font-size: 1.5em;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            color: #A06D7F;
+        }
+
+        #stats ul {
+            list-style-type: none;
+        }
+
+        h3 {
+            line-height: 2em;
+            color: #a29897;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
     </style>
 </head>
 
@@ -590,6 +606,10 @@
             <div id="nOfKanjiADay">漢字: 0</div>
         </div>
         <canvas id="myChart"></canvas>
+
+
+        <h3>Other Stats:</h3>
+        <div id="stats"></div>
 
     </div>
 
@@ -14649,6 +14669,98 @@
                     }
                 }
             });
+
+            // Calculate statistics
+            const sum = values.reduce((acc, value) => acc + value, 0);
+            const count = values.length;
+
+            // Calculate median
+            const sortedValues = [...values].sort((a, b) => a - b);
+            const middle = Math.floor(count / 2);
+            const median = count % 2 === 0 ? (sortedValues[middle - 1] + sortedValues[middle]) / 2 : sortedValues[middle];
+
+            // Calculate average
+            const average = sum / count;
+
+            // Calculate standard deviation
+            const squaredDifferences = values.map(value => Math.pow(value - average, 2));
+            const sumSquaredDifferences = squaredDifferences.reduce((acc, value) => acc + value, 0);
+            const variance = sumSquaredDifferences / count;
+            const standardDeviation = Math.sqrt(variance);
+
+            // Calculate mode
+            const modeMap = {};
+            let maxCount = 0;
+            let mode = null;
+
+            values.forEach(value => {
+                modeMap[value] = (modeMap[value] || 0) + 1;
+                if (modeMap[value] > maxCount) {
+                    maxCount = modeMap[value];
+                    mode = value;
+                }
+            });
+
+            // Calculate skewness (optional)
+            const skewness = values.reduce((acc, value) => acc + Math.pow((value - average) / standardDeviation, 3), 0) / count;
+
+            // Calculate kurtosis (optional)
+            const kurtosis = values.reduce((acc, value) => acc + Math.pow((value - average) / standardDeviation, 4) - 3, 0) / count;
+
+            console.log("Median:", median);
+            console.log("Average:", average);
+            console.log("Standard Deviation:", standardDeviation);
+            console.log("Mode:", mode);
+            console.log("Variance:", variance);
+            console.log("Skewness:", skewness);
+            console.log("Kurtosis:", kurtosis);
+
+            const startDate = new Date('2023-09-13');
+
+            // Calculate the estimated number of days needed to complete all kanji
+            const estimatedDaysToComplete = KanjiTotal / median;
+
+            // Calculate the estimated completion date
+            const estimatedCompletionDate = new Date(startDate);
+            estimatedCompletionDate.setDate(startDate.getDate() + estimatedDaysToComplete);
+
+            const formattedCompletionDate = estimatedCompletionDate.toLocaleDateString('it-IT', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            console.log('Estimated Completion Date:', formattedCompletionDate);
+
+
+
+            // Assuming you have an element with the id "stats" to display the list
+            const statsElement = document.getElementById("stats");
+
+            // Create an unordered list
+            const ul = document.createElement("ul");
+
+            // Create list items for each statistic
+            const medianItem = document.createElement("li");
+            medianItem.textContent = "Median: " + median;
+            ul.appendChild(medianItem);
+
+            const averageItem = document.createElement("li");
+            averageItem.textContent = "Average: " + average;
+            ul.appendChild(averageItem);
+
+            const stdDevItem = document.createElement("li");
+            stdDevItem.textContent = "Standard Deviation: " + standardDeviation;
+            ul.appendChild(stdDevItem);
+
+            const estimatedCompletionDateItem = document.createElement("li");
+            estimatedCompletionDateItem.textContent = "Estimated Completion Date: " + formattedCompletionDate;
+            ul.appendChild(estimatedCompletionDateItem);
+
+            // Set the content of the "stats" element to the created list
+            statsElement.innerHTML = "";
+            statsElement.appendChild(ul);
 
 
 
