@@ -322,7 +322,7 @@
 
         .settings-popup {
             position: fixed;
-            width: 70vw;
+            width: 80vw;
             height: 65vh;
             top: 50%;
             left: 50%;
@@ -550,6 +550,7 @@
             line-height: 2em;
             color: #a29897;
             font-family: Verdana, Geneva, Tahoma, sans-serif;
+            text-align: center;
         }
 
     </style>
@@ -14708,13 +14709,13 @@
             // Calculate kurtosis (optional)
             const kurtosis = values.reduce((acc, value) => acc + Math.pow((value - average) / standardDeviation, 4) - 3, 0) / count;
 
-            console.log("Median:", median);
-            console.log("Average:", average);
-            console.log("Standard Deviation:", standardDeviation);
-            console.log("Mode:", mode);
-            console.log("Variance:", variance);
-            console.log("Skewness:", skewness);
-            console.log("Kurtosis:", kurtosis);
+            // console.log("Median:", median);
+            // console.log("Average:", average);
+            // console.log("Standard Deviation:", standardDeviation);
+            // console.log("Mode:", mode);
+            // console.log("Variance:", variance);
+            // console.log("Skewness:", skewness);
+            // console.log("Kurtosis:", kurtosis);
 
             const startDate = new Date('2023-09-13');
 
@@ -14732,7 +14733,7 @@
                 year: 'numeric'
             });
 
-            console.log('Estimated Completion Date:', formattedCompletionDate);
+            // console.log('ETA:', formattedCompletionDate);
 
 
 
@@ -14744,19 +14745,23 @@
 
             // Create list items for each statistic
             const medianItem = document.createElement("li");
-            medianItem.textContent = "Median: " + median;
+            medianItem.textContent = "Median: " + median.toFixed(2);
             ul.appendChild(medianItem);
 
             const averageItem = document.createElement("li");
-            averageItem.textContent = "Average: " + average;
+            averageItem.textContent = "Average: " + average.toFixed(2);
             ul.appendChild(averageItem);
 
             const stdDevItem = document.createElement("li");
-            stdDevItem.textContent = "Standard Deviation: " + standardDeviation;
+            stdDevItem.textContent = "Standard Deviation: " + standardDeviation.toFixed(2);
             ul.appendChild(stdDevItem);
 
+            const modeItem = document.createElement("li");
+            modeItem.textContent = "Mode: " + mode;
+            ul.appendChild(modeItem);
+
             const estimatedCompletionDateItem = document.createElement("li");
-            estimatedCompletionDateItem.textContent = "Estimated Completion Date: " + formattedCompletionDate;
+            estimatedCompletionDateItem.textContent = "ETA: " + formattedCompletionDate;
             ul.appendChild(estimatedCompletionDateItem);
 
             // Set the content of the "stats" element to the created list
