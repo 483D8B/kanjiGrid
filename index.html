@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://483d8b.pythonanywhere.com/leitner.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         @font-face {
@@ -160,14 +161,14 @@
         input[type="range"]::-webkit-slider-thumb {
             /*  ...  */
             /*  slider progress trick  */
-            box-shadow: -100vw 0 0 100vw #9bd567 !important; 
+            box-shadow: -100vw 0 0 100vw #9bd567 !important;
         }
 
         /* Thumb: Firefox */
         input[type="range"]::-moz-range-thumb {
             /*  ...  */
             /*  slider progress trick  */
-            box-shadow: -100vw -100px 0 100vw #9bd567 !important;        
+            box-shadow: -100vw -100px 0 100vw #9bd567 !important;
         }
 
         .zoomContainer {
@@ -322,9 +323,10 @@
         .settings-popup {
             position: fixed;
             width: 70vw;
-            height: 60vh;
+            height: 90vh;
             top: 50%;
             left: 50%;
+            padding: 2%;
             transform: translate(-50%, -50%);
             padding-top: 5%;
             background-color: white;
@@ -332,10 +334,11 @@
             border-radius: 2px;
             border: 2px solid black;
             display: none;
-            opacity: 0.95;
+            opacity: 0.98;
             font-family: Verdana, sans-serif;
             flex-direction: column;
             align-items: center;
+            overflow-y: auto;
         }
 
         .settings-item {
@@ -517,6 +520,21 @@
             opacity: 0;
             transition: transform 150ms ease-out, opacity 150ms ease-out;
         }
+
+        #nOfKanjiADay {
+            display: inline-block;
+            position: relative;
+            font-family: Verdana, sans-serif;
+            color: #a29897;
+            background-color: white;
+            margin-right: 20px;
+            padding: 10px;
+            font-weight: 700;
+            font-size: 2em;
+            width: 5em;
+            border: 2px solid black;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -567,6 +585,11 @@
         <div class="settings-item">
             <button id="showKeyword">Show keyword</button>
         </div>
+
+        <div class="settings-item">
+            <div id="nOfKanjiADay">漢字: 0</div>
+        </div>
+        <canvas id="myChart"></canvas>
 
     </div>
 
@@ -14420,6 +14443,12 @@
 
                 updateDateDisplay(selectedDataset);
 
+                // Assuming Differences is the object containing the value
+                const nOfKanjiADayValue = Differences[sliderValue - 1] || 0;
+
+                // Change the value of the div with id "nOfKanjiADay"
+                document.getElementById("nOfKanjiADay").textContent = "漢字: " + nOfKanjiADayValue;
+
                 $(".divTableCell").each(function () {
                     const id = $(this).attr("id");
                     if (leitnerData[selectedDataset] && leitnerData[selectedDataset].hasOwnProperty(id)) {
@@ -14591,6 +14620,38 @@
                     cell.style.display = "block"; // Or whatever the initial display value should be
                 }
             });
+
+
+            // Extract keys and values from the Differences object
+            const labels = Object.keys(Differences);
+            const values = Object.values(Differences);
+
+            // Create a bar chart using Chart.js
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'n° of 漢字 studied',
+                        data: values,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Adjust the color as needed
+                        borderColor: 'rgba(75, 192, 192, 1)', // Adjust the color as needed
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            type: 'logarithmic',
+                        }
+                    }
+                }
+            });
+
+
+
         });  //end doc ready
 
 
