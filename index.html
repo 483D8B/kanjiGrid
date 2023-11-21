@@ -1,4 +1,4 @@
-<!-- version 6 (optimized and new search bar + custom checkbox and slider) 21/11/2023 -->
+<!-- version 7 (more squared cells) 21/11/2023 -->
 <!DOCTYPE html>
 <html>
 <!-- https://moderncss.dev/pure-css-custom-checkbox-style/ -->
@@ -55,10 +55,9 @@
             display: flex;
             flex-flow: row wrap;
             justify-content: center;
-            gap: 2px 2px;
+            gap: 3px 3px;
             padding-left: 2px;
             padding-right: 2px;
-
         }
 
         .divTableCell {
@@ -74,6 +73,8 @@
             text-align: center;
             font-size: 3em;
             user-select: none;
+            margin-top: -5px;
+            margin-bottom: -10px;
         }
 
         .keyword {
@@ -95,8 +96,12 @@
             user-select: none;
             -moz-user-select: none;
             -webkit-user-select: none;
-            font-size: 1em;
+            font-size: 0.8em;
             font-family: Verdana, sans-serif;
+            /* border-bottom: 1px solid rgba(162,152,151,0.5);
+            margin-left: 15%;
+            margin-right: 15%; */
+            text-align: center;
         }
 
         #fileSlider {
@@ -14541,19 +14546,37 @@
             $zoomSlider.on("input", function () {
                 const fontSizeMultiplier = $(this).val();
                 const kanjiFontSize = fontSizeMultiplier === "1" ? "3em" : "0.80em";
-                const framenrFontSize = fontSizeMultiplier === "1" ? "1em" : "0em";
+                const framenrFontSize = fontSizeMultiplier === "1" ? "0.8em" : "0em";
 
                 if (fontSizeMultiplier === "0") {
                     $(".divTableCell").css({
-                        'border': 'silver solid 1px',
+                        'border': 'black solid 1px',
                         'padding-left': '5px',
                         'padding-right': '5px'
+                    });
+                    $(".kanji").css({
+                        'margin-top': '0px',
+                        'margin-bottom': '0px'
+                    });
+                    $(".divTableBody").css({
+                        'margin-top': '0px',
+                        'margin-bottom': '0px',
+                        'gap': '1px 1px'
                     });
                 } else {
                     $(".divTableCell").css({
                         'border': 'black solid 1px',
                         'padding-left': '1px',
                         'padding-right': '1px'
+                    });
+                    $(".kanji").css({
+                        'margin-top': '0px',
+                        'margin-bottom': '0px',
+                        'margin-top': '-5px',
+                        'margin-bottom': '-10px'
+                    });
+                    $(".divTableBody").css({
+                        'gap': '3px 3px'
                     });
                 }
 
