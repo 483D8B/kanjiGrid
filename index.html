@@ -599,7 +599,7 @@
             </div>
         </div>
 
-        
+
         <div class="settings-item">
 
             <label class="form-control">Forgotten
@@ -14338,8 +14338,8 @@
             else {
                 dateText = selectedDateObj ? `${formatDateToDateString(new Date(selectedDateObj.date))}` : "No data ( •_•)";
                 $("#selectedDayLabel").text(`${dateText}`);
-            } 
-            
+            }
+
             dateElement.text(dateText);
         }
         // Function to format the date similar to toDateString
@@ -14508,7 +14508,7 @@
                         $(this).css("background-color", "white");
                     }
                 });
-                
+
 
                 // Remove existing vertical line annotations
                 myChart.options.plugins.annotation.annotations = [];
@@ -14682,6 +14682,49 @@
                     // Update the slider value
                     $fileSlider.val(newSliderValue).trigger("input");
                 }
+            });
+
+            // Get the slider element
+            const fileSlider = document.getElementById('fileSlider'); // Replace 'yourSliderId' with the actual ID of your slider
+            let initialTouchX;
+
+            // Function to handle touch start event
+            const handleTouchStart = (event) => {
+                initialTouchX = event.touches[0].clientX;
+            };
+
+            // Function to handle touch move event
+            const handleTouchMove = (event) => {
+                if (initialTouchX === undefined) {
+                    return;
+                }
+
+                const currentTouchX = event.touches[0].clientX;
+                const deltaX = currentTouchX - initialTouchX;
+
+                // Adjust the sensitivity based on your needs
+                const sensitivity = 10;
+
+                if (deltaX > sensitivity) {
+                    // Swipe right, move to the next slider
+                    fileSlider.stepUp();
+                } else if (deltaX < -sensitivity) {
+                    // Swipe left, move to the previous slider
+                    fileSlider.stepDown();
+                }
+
+                // Reset initial touch position
+                initialTouchX = undefined;
+            };
+
+            // Add touch event listeners to the document
+            document.addEventListener('touchstart', handleTouchStart);
+            document.addEventListener('touchmove', handleTouchMove);
+
+            // Cleanup: Remove touch event listeners on page unload
+            window.addEventListener('beforeunload', () => {
+                document.removeEventListener('touchstart', handleTouchStart);
+                document.removeEventListener('touchmove', handleTouchMove);
             });
 
             // Add a click event listener to the delete button
