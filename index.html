@@ -14686,11 +14686,12 @@
 
             // Get the slider element
             const fileSlider = document.getElementById('fileSlider'); // Replace 'yourSliderId' with the actual ID of your slider
-            let initialTouchX;
+            let initialTouchX, isSwipingHorizontally = false;
 
             // Function to handle touch start event
             const handleTouchStart = (event) => {
                 initialTouchX = event.touches[0].clientX;
+                isSwipingHorizontally = false;
             };
 
             // Function to handle touch move event
@@ -14700,38 +14701,45 @@
                 }
 
                 const currentTouchX = event.touches[0].clientX;
+
+                // Calculate the horizontal distance
                 const deltaX = currentTouchX - initialTouchX;
 
                 // Adjust the sensitivity based on your needs
-                const sensitivity = 5;
+                const sensitivity = 2;
 
-                // Calculate the slider movement based on the swipe distance
-                const sliderMovement = deltaX / sensitivity;
-
-                // Update the slider value continuously
-                fileSlider.value = parseInt(fileSlider.value) + sliderMovement;
-
-                // Trigger the 'input' event on the slider to simulate user input
-                const inputEvent = new Event('input', { bubbles: true });
-                fileSlider.dispatchEvent(inputEvent);
-
-                // Reset initial touch position
-                initialTouchX = currentTouchX;
-
-                // Determine whether the swipe is mainly horizontal
-                const deltaY = Math.abs(event.touches[0].clientY - event.touches[1].clientY);
-                const deltaXAbs = Math.abs(deltaX);
-
-                if (deltaXAbs > deltaY) {
+                // Check if the swipe is mainly horizontal
+                if (Math.abs(deltaX) > sensitivity) {
                     // Prevent vertical scroll if the swipe is mainly horizontal
                     event.preventDefault();
+                    isSwipingHorizontally = true;
+
+                    // Determine the direction of the swipe
+                    const direction = deltaX > 0 ? 1 : -1;
+
+                    // Calculate the slider movement based on the swipe distance and direction
+                    const sliderMovement = direction * Math.abs(deltaX) / sensitivity;
+
+                    // Update the slider value continuously
+                    fileSlider.value = parseInt(fileSlider.value) + sliderMovement;
+
+                    // Trigger the 'input' event on the slider to simulate user input
+                    const inputEvent = new Event('input', { bubbles: true });
+                    fileSlider.dispatchEvent(inputEvent);
+                } else {
+                    // The swipe is not mainly horizontal, allow default behavior
+                    isSwipingHorizontally = false;
                 }
+
+                // Update initial touch position
+                initialTouchX = currentTouchX;
             };
 
             // Function to handle touch end event
             const handleTouchEnd = () => {
-                // Reset initial touch position when the swipe ends
+                // Reset initial touch position and the horizontal swipe flag
                 initialTouchX = undefined;
+                isSwipingHorizontally = false;
             };
 
             // Add touch event listeners to the document
@@ -14746,11 +14754,6 @@
                 document.removeEventListener('touchend', handleTouchEnd);
             });
 
-            // Add an event listener for the 'input' event on the slider
-            fileSlider.addEventListener('input', (event) => {
-                // Your code to handle the slider value change goes here
-                console.log('Slider value changed:', event.target.value);
-            });
 
             // Add a click event listener to the delete button
             $deleteButton.on("click", function () {
