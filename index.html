@@ -14686,73 +14686,59 @@
 
             // Get the slider element
             const fileSlider = document.getElementById('fileSlider'); // Replace 'yourSliderId' with the actual ID of your slider
-            let initialTouchX, isSwipingHorizontally = false;
+            let touchActive = false;
 
             // Function to handle touch start event
             const handleTouchStart = (event) => {
-                initialTouchX = event.touches[0].clientX;
-                isSwipingHorizontally = false;
+                touchActive = true;
+                updateSlider(event);
             };
 
             // Function to handle touch move event
-            const handleTouchMove = (event) => {
-                if (initialTouchX === undefined) {
-                    return;
-                }
+            const updateSlider = (event) => {
+                if (touchActive) {
+                    const step = 1; // Adjust the step value based on your needs
+                    const threshold = 0.2; // Adjust the threshold based on your needs
 
-                const currentTouchX = event.touches[0].clientX;
+                    // Determine the touch position relative to the screen width
+                    const touchX = event.touches[0].clientX;
+                    const screenWidth = window.innerWidth;
+                    const touchPosition = touchX / screenWidth;
 
-                // Calculate the horizontal distance
-                const deltaX = currentTouchX - initialTouchX;
-
-                // Adjust the sensitivity based on your needs
-                const sensitivity = 10;
-
-                // Check if the swipe is mainly horizontal
-                if (Math.abs(deltaX) > sensitivity) {
-                    // Prevent vertical scroll if the swipe is mainly horizontal
-                    event.preventDefault();
-                    isSwipingHorizontally = true;
-
-                    // Determine the direction of the swipe
-                    const direction = deltaX > 0 ? 1 : -1;
-
-                    // Calculate the slider movement based on the swipe distance and direction
-                    const sliderMovement = direction * Math.abs(deltaX) / sensitivity;
-
-                    // Update the slider value continuously
-                    fileSlider.value = parseInt(fileSlider.value) + sliderMovement;
+                    // Check if the touch is on the right or left side of the screen
+                    if (touchPosition > 1 - threshold) {
+                        // Touch on the right side, move the slider to the right
+                        fileSlider.stepUp(step);
+                    } else if (touchPosition < threshold) {
+                        // Touch on the left side, move the slider to the left
+                        fileSlider.stepDown(step);
+                    }
 
                     // Trigger the 'input' event on the slider to simulate user input
                     const inputEvent = new Event('input', { bubbles: true });
                     fileSlider.dispatchEvent(inputEvent);
-                } else {
-                    // The swipe is not mainly horizontal, allow default behavior
-                    isSwipingHorizontally = false;
-                }
 
-                // Update initial touch position
-                initialTouchX = currentTouchX;
+                    requestAnimationFrame(() => updateSlider(event));
+                }
             };
 
             // Function to handle touch end event
             const handleTouchEnd = () => {
-                // Reset initial touch position and the horizontal swipe flag
-                initialTouchX = undefined;
-                isSwipingHorizontally = false;
+                touchActive = false;
             };
 
             // Add touch event listeners to the document
             document.addEventListener('touchstart', handleTouchStart);
-            document.addEventListener('touchmove', handleTouchMove);
+            document.addEventListener('touchmove', updateSlider);
             document.addEventListener('touchend', handleTouchEnd);
 
             // Cleanup: Remove touch event listeners on page unload
             window.addEventListener('beforeunload', () => {
                 document.removeEventListener('touchstart', handleTouchStart);
-                document.removeEventListener('touchmove', handleTouchMove);
+                document.removeEventListener('touchmove', updateSlider);
                 document.removeEventListener('touchend', handleTouchEnd);
             });
+
 
 
             // Add a click event listener to the delete button
