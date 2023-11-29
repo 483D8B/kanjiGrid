@@ -14686,54 +14686,53 @@
 
             // Get the slider element
             const fileSlider = document.getElementById('fileSlider'); // Replace 'yourSliderId' with the actual ID of your slider
+            let touchStartTime;
             let touchActive = false;
-            let longPressTimer;
 
             // Function to handle touch start event
             const handleTouchStart = (event) => {
                 touchActive = true;
-
-                // Start a timer for long press detection
-                longPressTimer = setTimeout(() => {
-                    // If the user is still pressing after the delay, initiate continuous slider movement
-                    if (touchActive) {
-                        updateSlider(event);
-                    }
-                }, 500); // Adjust the delay duration (in milliseconds) based on your preference
+                touchStartTime = Date.now();
+                updateSlider(event);
             };
 
             // Function to handle touch move event
             const updateSlider = (event) => {
-                const step = 1; // Adjust the step value based on your needs
-                const threshold = 0.2; // Adjust the threshold based on your needs
+                if (touchActive) {
+                    const step = 1; // Adjust the step value based on your needs
+                    const threshold = 0.2; // Adjust the threshold based on your needs
+                    const touchDurationThreshold = 500; // Adjust the duration threshold for a long press (in milliseconds)
 
-                // Determine the touch position relative to the screen width
-                const touchX = event.touches[0].clientX;
-                const screenWidth = window.innerWidth;
-                const touchPosition = touchX / screenWidth;
+                    const touchX = event.touches[0].clientX;
+                    const screenWidth = window.innerWidth;
+                    const touchPosition = touchX / screenWidth;
 
-                // Check if the touch is on the right or left side of the screen
-                if (touchPosition > 1 - threshold) {
-                    // Touch on the right side, move the slider to the right
-                    fileSlider.stepUp(step);
-                } else if (touchPosition < threshold) {
-                    // Touch on the left side, move the slider to the left
-                    fileSlider.stepDown(step);
+                    // Check if the touch is on the right or left side of the screen
+                    if (touchPosition > 1 - threshold) {
+                        // Touch on the right side, move the slider to the right
+                        fileSlider.stepUp(step);
+                    } else if (touchPosition < threshold) {
+                        // Touch on the left side, move the slider to the left
+                        fileSlider.stepDown(step);
+                    }
+
+                    // Trigger the 'input' event on the slider to simulate user input
+                    const inputEvent = new Event('input', { bubbles: true });
+                    fileSlider.dispatchEvent(inputEvent);
+
+                    const currentTimestamp = Date.now();
+                    const touchDuration = currentTimestamp - touchStartTime;
+
+                    // If touch duration exceeds the threshold, continue updating the slider
+                    if (touchDuration > touchDurationThreshold) {
+                        requestAnimationFrame(() => updateSlider(event));
+                    }
                 }
-
-                // Trigger the 'input' event on the slider to simulate user input
-                const inputEvent = new Event('input', { bubbles: true });
-                fileSlider.dispatchEvent(inputEvent);
-
-                requestAnimationFrame(() => updateSlider(event));
             };
 
             // Function to handle touch end event
             const handleTouchEnd = () => {
                 touchActive = false;
-
-                // Clear the long press timer
-                clearTimeout(longPressTimer);
             };
 
             // Add touch event listeners to the document
