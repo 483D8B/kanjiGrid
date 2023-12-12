@@ -14750,20 +14750,27 @@
             let isLeftBarClicked = false;
             let isRightBarClicked = false;
 
-            leftBar.addEventListener('mousedown', function () {
-                isLeftBarClicked = true;
-                handleVerticalBarClick('left');
-            });
+            leftBar.addEventListener('mousedown', startVerticalBarClick);
+            rightBar.addEventListener('mousedown', startVerticalBarClick);
 
-            rightBar.addEventListener('mousedown', function () {
-                isRightBarClicked = true;
-                handleVerticalBarClick('right');
-            });
+            leftBar.addEventListener('touchstart', startVerticalBarClick);
+            rightBar.addEventListener('touchstart', startVerticalBarClick);
 
-            document.addEventListener('mouseup', function () {
+            document.addEventListener('mouseup', stopVerticalBarClick);
+            document.addEventListener('touchend', stopVerticalBarClick);
+
+            function startVerticalBarClick(event) {
+                event.preventDefault(); // Prevent default touch behavior
+                const direction = event.target.classList.contains('left-bar') ? 'left' : 'right';
+                isLeftBarClicked = direction === 'left';
+                isRightBarClicked = direction === 'right';
+                handleVerticalBarClick(direction);
+            }
+
+            function stopVerticalBarClick() {
                 isLeftBarClicked = false;
                 isRightBarClicked = false;
-            });
+            }
 
             function handleVerticalBarClick(direction) {
                 const step = 1;
