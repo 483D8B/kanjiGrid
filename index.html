@@ -1,4 +1,4 @@
-<!-- version 7 (more squared cells using line-height) 29/11/2023 -->
+<!-- version 7 (more squared cells using line-height) 13/12/2023 -->
 <!DOCTYPE html>
 <html>
 <!-- https://moderncss.dev/pure-css-custom-checkbox-style/ -->
@@ -574,6 +574,58 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
             text-align: center;
         }
+
+        .arrow {
+            position: fixed;
+            width: 25px;
+            height: 25px;
+            top: 50%;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .left-arrow {
+            left: 5px;
+            border-bottom: 3px solid black;
+            border-left: 3px solid black;
+            transform: rotate(45deg);
+        }
+
+        .right-arrow {
+            right: 5px;
+            border-bottom: 3px solid black;
+            border-left: 3px solid black;
+            transform: rotate(-135deg);
+        }
+
+        .vertical-bar {
+            position: fixed;
+            top: 10vh;
+            bottom: 10vh;
+            width: 20px;
+            /* Adjust the width of the vertical bar */
+            background-color: #A06D7F;
+            /* Adjust the background color */
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .left-bar {
+            left: 0;
+        }
+
+        .right-bar {
+            right: 0;
+        }
+
+        .vertical-bar:hover {
+            opacity: 0.5;
+        }
     </style>
 </head>
 
@@ -640,7 +692,8 @@
 
     </div>
 
-
+    <div class="vertical-bar left-bar"></div>
+    <div class="vertical-bar right-bar"></div>
 
     <span id="datasetDate">September 13, 2023</span>
     <input autocomplete="off" type="range" id="fileSlider" min="1" max="30" value="1">
@@ -14684,74 +14737,41 @@
                 }
             });
 
+
             // Get the slider element
-            const fileSlider = document.getElementById('fileSlider'); // Replace 'yourSliderId' with the actual ID of your slider
-            let touchStartTime;
-            let touchActive = false;
-            let longPressTimer;
+            const fileSlider = document.getElementById('fileSlider');
+            const leftBar = document.querySelector('.left-bar');
+            const rightBar = document.querySelector('.right-bar');
 
-            // Function to handle touch start event
-            const handleTouchStart = (event) => {
-                touchActive = true;
-                touchStartTime = Date.now();
+            let isLeftBarClicked = false;
+            let isRightBarClicked = false;
 
-                // Start a timer for long press detection
-                longPressTimer = setTimeout(() => {
-                    // If the user is still pressing after the delay, initiate continuous slider movement
-                    if (touchActive) {
-                        updateSlider(event);
-                    }
-                }, 500); // Adjust the delay duration (in milliseconds) based on your preference
-            };
-
-            // Function to handle touch move event
-            const updateSlider = (event) => {
-                if (touchActive) {
-                    const step = 1; // Adjust the step value based on your needs
-
-                    const touchX = event.touches[0].clientX;
-                    const screenWidth = window.innerWidth;
-                    const touchPosition = touchX / screenWidth;
-
-                    // Check if the touch is on the right or left side of the screen
-                    if (touchPosition > 0.8) {
-                        // Touch on the right side, move the slider to the right continuously
-                        fileSlider.stepUp(step);
-                        triggerSliderInput();
-                    } else if (touchPosition < 0.2) {
-                        // Touch on the left side, move the slider to the left continuously
-                        fileSlider.stepDown(step);
-                        triggerSliderInput();
-                    }
-                }
-            };
-
-            // Function to handle touch end event
-            const handleTouchEnd = () => {
-                touchActive = false;
-
-                // Clear the long press timer
-                clearTimeout(longPressTimer);
-            };
-
-            // Function to trigger the 'input' event on the slider
-            const triggerSliderInput = () => {
-                const inputEvent = new Event('input', { bubbles: true });
-                fileSlider.dispatchEvent(inputEvent);
-            };
-
-            // Add touch event listeners to the document
-            document.addEventListener('touchstart', handleTouchStart);
-            document.addEventListener('touchmove', updateSlider);
-            document.addEventListener('touchend', handleTouchEnd);
-
-            // Cleanup: Remove touch event listeners on page unload
-            window.addEventListener('beforeunload', () => {
-                document.removeEventListener('touchstart', handleTouchStart);
-                document.removeEventListener('touchmove', updateSlider);
-                document.removeEventListener('touchend', handleTouchEnd);
+            leftBar.addEventListener('mousedown', function () {
+                isLeftBarClicked = true;
+                handleVerticalBarClick('left');
             });
 
+            rightBar.addEventListener('mousedown', function () {
+                isRightBarClicked = true;
+                handleVerticalBarClick('right');
+            });
+
+            document.addEventListener('mouseup', function () {
+                isLeftBarClicked = false;
+                isRightBarClicked = false;
+            });
+
+            function handleVerticalBarClick(direction) {
+                const step = 1;
+                const interval = setInterval(function () {
+                    if ((direction === 'left' && isLeftBarClicked) || (direction === 'right' && isRightBarClicked)) {
+                        fileSlider.value = parseInt(fileSlider.value) + (direction === 'left' ? -step : step);
+                        fileSlider.dispatchEvent(new Event('input')); // Trigger the 'input' event
+                    } else {
+                        clearInterval(interval);
+                    }
+                }, 150); // Adjust the interval as needed for your desired speed
+            }
 
 
             // Add a click event listener to the delete button
