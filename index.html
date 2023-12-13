@@ -14539,6 +14539,43 @@
                 });
             });
 
+
+
+            // Extract keys and values from the Differences object
+            const labels = Object.keys(Differences);
+            const values = Object.values(Differences);
+
+            // Create a bar chart using Chart.js
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'n° of new 漢字 studied',
+                        data: values,
+                        backgroundColor: '#cde6f5', // Adjust the color as needed
+                        borderColor: 'rgba(75, 192, 192, 1)', // Adjust the color as needed
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            type: 'logarithmic',
+                        }
+                    }
+                },
+        plugins: {
+            annotation: {
+                drawTime: 'afterDatasetsDraw',
+                annotations: [],
+            }
+        }
+            });
+
+
             // Handle slider change event
             $fileSlider.on("input", function () {
                 const sliderValue = $(this).val();
@@ -14570,6 +14607,17 @@
                 // Remove existing vertical line annotations
                 myChart.options.plugins.annotation.annotations = [];
 
+                // Add a new horizontal line annotation at the selected day
+                myChart.options.plugins.annotation.annotations.push({
+                    type: 'line',
+                    mode: 'horizontal',
+                    scaleID: 'y',
+                    value: calculateMedian(values), // You need to implement this function
+                    borderColor: '#A06D7F', // Adjust the color as needed
+                    borderWidth: 1,
+                    borderDash: [5, 5], // Adjust the dash pattern as needed
+                });
+
                 // Add a new vertical line annotation at the selected day
                 myChart.options.plugins.annotation.annotations.push({
                     type: 'line',
@@ -14584,6 +14632,9 @@
                         position: 'center', // Adjust the position as needed
                     }
                 });
+
+
+
 
                 // Update the chart to apply the changes
                 myChart.update();
@@ -14800,48 +14851,21 @@
             });
 
 
-            // Extract keys and values from the Differences object
-            const labels = Object.keys(Differences);
-            const values = Object.values(Differences);
-
-            // Create a bar chart using Chart.js
-            const ctx = document.getElementById('myChart').getContext('2d');
-            const myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'n° of new 漢字 studied',
-                        data: values,
-                        backgroundColor: '#cde6f5', // Adjust the color as needed
-                        borderColor: 'rgba(75, 192, 192, 1)', // Adjust the color as needed
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            type: 'logarithmic',
-                        }
-                    }
-                },
-                plugins: {
-                    annotation: {
-                        drawTime: 'afterDatasetsDraw',
-                        annotations: [],
-                    }
-                }
-            });
-
             // Calculate statistics
             const sum = values.reduce((acc, value) => acc + value, 0);
             const count = values.length;
+
 
             // Calculate median
             const sortedValues = [...values].sort((a, b) => a - b);
             const middle = Math.floor(count / 2);
             const median = count % 2 === 0 ? (sortedValues[middle - 1] + sortedValues[middle]) / 2 : sortedValues[middle];
+
+            function calculateMedian(arr) {
+                const sortedValues = [...arr].sort((a, b) => a - b);
+                const middle = Math.floor(arr.length / 2);
+                return arr.length % 2 === 0 ? (sortedValues[middle - 1] + sortedValues[middle]) / 2 : sortedValues[middle];
+            }
 
             // Calculate average
             const average = sum / count;
