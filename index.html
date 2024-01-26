@@ -1,4 +1,4 @@
-<!-- version 7 (more squared cells using line-height) 26/12/2023 -->
+<!-- version 7 (more squared cells using line-height) 26/01/2024 -->
 <!DOCTYPE html>
 <html>
 <!-- https://moderncss.dev/pure-css-custom-checkbox-style/ -->
@@ -627,7 +627,8 @@
             right: 0;
         }
 
-        .vertical-bar:hover, .vertical-bar:active {
+        .vertical-bar:hover,
+        .vertical-bar:active {
             opacity: 0.5;
         }
     </style>
@@ -14567,12 +14568,12 @@
                         }
                     }
                 },
-        plugins: {
-            annotation: {
-                drawTime: 'afterDatasetsDraw',
-                annotations: [],
-            }
-        }
+                plugins: {
+                    annotation: {
+                        drawTime: 'afterDatasetsDraw',
+                        annotations: [],
+                    }
+                }
             });
 
 
@@ -14838,9 +14839,15 @@
 
             // Add a click event listener to the delete button
             $deleteButton.on("click", function () {
-                // Clear the input field
-                $searchInput.val("");
 
+                // Check if the input is not empty
+                if ($searchInput.val() !== "") {
+                    // Clear the input field
+                    $searchInput.val("");
+
+                    // Focus on the input field
+                    $searchInput.focus();
+                }
 
                 $(".divTableCell .failure-value").remove();
                 // Show all .divTableCell elements
