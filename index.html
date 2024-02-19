@@ -14883,8 +14883,8 @@
             // Calculate standard deviation
             const squaredDifferences = values.map(value => Math.pow(value - average, 2));
             const sumSquaredDifferences = squaredDifferences.reduce((acc, value) => acc + value, 0);
-            const variance = sumSquaredDifferences / count;
-            const standardDeviation = Math.sqrt(variance);
+            const sampleVariance = sumSquaredDifferences / (count - 1); // using (n - 1) for sample
+            const sampleStandardDeviation = Math.sqrt(sampleVariance);
 
             // Calculate mode
             const modeMap = {};
@@ -14899,17 +14899,17 @@
                 }
             });
 
-            // Calculate skewness (optional)
-            const skewness = values.reduce((acc, value) => acc + Math.pow((value - average) / standardDeviation, 3), 0) / count;
+            // Calculate skewness for a sample
+            const skewness = (count * values.reduce((acc, value) => acc + Math.pow((value - average) / sampleStandardDeviation, 3), 0)) / ((count - 1) * (count - 2));
 
-            // Calculate kurtosis (optional)
-            const kurtosis = values.reduce((acc, value) => acc + Math.pow((value - average) / standardDeviation, 4) - 3, 0) / count;
+            // Calculate kurtosis for a sample
+            const kurtosis = ((count * (count + 1)) / ((count - 1) * (count - 2) * (count - 3))) * values.reduce((acc, value) => acc + Math.pow((value - average) / sampleStandardDeviation, 4), 0) - (3 * Math.pow((count - 1), 2)) / ((count - 2) * (count - 3));
 
             // console.log("Median:", median);
             // console.log("Average:", average);
-            // console.log("Standard Deviation:", standardDeviation);
+            // console.log("Standard Deviation:", sampleStandardDeviation );
             // console.log("Mode:", mode);
-            // console.log("Variance:", variance);
+            // console.log("sampleVariance :", sampleVariance );
             // console.log("Skewness:", skewness);
             // console.log("Kurtosis:", kurtosis);
 
@@ -14920,8 +14920,8 @@
 
 
             // Calculate the estimated number of days needed to complete all kanji
-            const estimatedLower_bound_daysToComplete = Math.ceil(estimatedDaysToComplete - standardDeviation); // Round up to the nearest whole day
-            const estimatedUpper_bound_daysToComplete = Math.ceil(estimatedDaysToComplete + standardDeviation); // Round up to the nearest whole day
+            const estimatedLower_bound_daysToComplete = Math.ceil(estimatedDaysToComplete - sampleStandardDeviation); // Round up to the nearest whole day
+            const estimatedUpper_bound_daysToComplete = Math.ceil(estimatedDaysToComplete + sampleStandardDeviation); // Round up to the nearest whole day
 
 
             // Calculate the estimated completion date
@@ -14953,7 +14953,7 @@
             });
 
 
-           // console.log('ETC:', formattedCompletionDate);
+            // console.log('ETC:', formattedCompletionDate);
 
 
 
@@ -14978,7 +14978,7 @@
             ul.appendChild(averageItem);
 
             const stdDevItem = document.createElement("li");
-            stdDevItem.textContent = "Standard Deviation: " + standardDeviation.toFixed(2);
+            stdDevItem.textContent = "Standard Deviation: " + sampleStandardDeviation.toFixed(2);
             ul.appendChild(stdDevItem);
 
             const modeItem = document.createElement("li");
@@ -14987,15 +14987,15 @@
 
 
             const estimatedCompletionDateItemDOWN = document.createElement("li");
-            estimatedCompletionDateItemDOWN.textContent = "-: " + formattedCompletionDateDOWN + " (" + (kanjiLeft/estimatedLower_bound_daysToComplete).toFixed(2) +  ")";
+            estimatedCompletionDateItemDOWN.textContent = "-: " + formattedCompletionDateDOWN + " (" + (kanjiLeft / estimatedLower_bound_daysToComplete).toFixed(2) + ")";
             ul.appendChild(estimatedCompletionDateItemDOWN);
 
             const estimatedCompletionDateItem = document.createElement("li");
-            estimatedCompletionDateItem.textContent = "ETC: " + formattedCompletionDate  + " (" + median + ")";
+            estimatedCompletionDateItem.textContent = "ETC: " + formattedCompletionDate + " (" + median + ")";
             ul.appendChild(estimatedCompletionDateItem);
 
             const estimatedCompletionDateItemUP = document.createElement("li");
-            estimatedCompletionDateItemUP.textContent = "+: " + formattedCompletionDateUP  + " (" + (kanjiLeft/estimatedUpper_bound_daysToComplete).toFixed(2) +  ")";
+            estimatedCompletionDateItemUP.textContent = "+: " + formattedCompletionDateUP + " (" + (kanjiLeft / estimatedUpper_bound_daysToComplete).toFixed(2) + ")";
             ul.appendChild(estimatedCompletionDateItemUP);
 
             // Set the content of the "stats" element to the created list
@@ -15003,6 +15003,9 @@
             statsElement.appendChild(ul);
 
 
+
+            // const dataset = Object.values(Differences);
+            // console.log(dataset)
 
         });  //end doc ready
 
