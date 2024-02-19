@@ -1,4 +1,4 @@
-<!-- version 7 (more squared cells using line-height) 27/01/2024 -->
+<!-- version 7 (more squared cells using line-height) 19/02/2024 -->
 <!DOCTYPE html>
 <html>
 <!-- https://moderncss.dev/pure-css-custom-checkbox-style/ -->
@@ -632,7 +632,7 @@
             opacity: 0.5;
         }
 
-        .divTableCell.failure-value > .failure-value {
+        .divTableCell.failure-value>.failure-value {
             color: white;
         }
     </style>
@@ -667,12 +667,11 @@
                 <input type="checkbox" id="forgotten">
             </label>
 
-            <span class="key" style="background-color: #a29897;"> </span><span class="key"
-                style="background-color: #645452;"> </span><span class="key"
-                style="background-color: #504342;"> </span><span class="key"
-                style="background-color: #322a29;"> </span><span class="key"
-                style="background-color: #282221;"> </span><span class="keySettings">
-                 </span>
+            <span class="key" style="background-color: #a29897;"> </span><span class="key"
+                style="background-color: #645452;"> </span><span class="key" style="background-color: #504342;">
+            </span><span class="key" style="background-color: #322a29;"> </span><span class="key"
+                style="background-color: #282221;"> </span><span class="keySettings">
+            </span>
         </div>
 
         <div class="settings-item">
@@ -721,12 +720,10 @@
     <!-- <input id="mySearch" type="text" placeholder="Search..."> -->
     <p style="text-align:center">
         Weak&nbsp;<span class="key" style="background-color: #E67373;"> </span><span class="key"
-            style="background-color: #E6C973;"> </span><span class="key"
-            style="background-color: #ACE673;"> </span><span class="key"
-            style="background-color: #73E690;"> </span><span class="key"
-            style="background-color: #73E6E6;"> </span><span class="key"
-            style="background-color: #7390E6;"> </span><span class="key"
-            style="background-color: #AC73E6;"> </span><span class="key"
+            style="background-color: #E6C973;"> </span><span class="key" style="background-color: #ACE673;">
+             </span><span class="key" style="background-color: #73E690;"> </span><span class="key"
+            style="background-color: #73E6E6;"> </span><span class="key" style="background-color: #7390E6;">
+             </span><span class="key" style="background-color: #AC73E6;"> </span><span class="key"
             style="background-color: #EE82EE;"> </span>&nbsp;Strong
 
 
@@ -14545,7 +14542,6 @@
             });
 
 
-
             // Extract keys and values from the Differences object
             const labels = Object.keys(Differences);
             const values = Object.values(Differences);
@@ -14864,7 +14860,10 @@
 
             // Calculate statistics
             const sum = values.reduce((acc, value) => acc + value, 0);
-            const count = values.length;
+            const count = values.length;  // total number of revision days
+
+            const kanjiStudiedTillNow = Math.round(KanjiTotal * progress.toFixed(2) / 100);
+            const kanjiLeft = KanjiTotal - kanjiStudiedTillNow;
 
 
             // Calculate median
@@ -14917,11 +14916,22 @@
             const startDate = new Date('2023-09-13');
 
             // Calculate the estimated number of days needed to complete all kanji
-            const estimatedDaysToComplete = KanjiTotal / median;
+            const estimatedDaysToComplete = kanjiLeft / median;
+
+
+            // Calculate the estimated number of days needed to complete all kanji
+            const estimatedLower_bound_daysToComplete = Math.ceil(estimatedDaysToComplete - standardDeviation); // Round up to the nearest whole day
+            const estimatedUpper_bound_daysToComplete = Math.ceil(estimatedDaysToComplete + standardDeviation); // Round up to the nearest whole day
+
 
             // Calculate the estimated completion date
-            const estimatedCompletionDate = new Date(startDate);
-            estimatedCompletionDate.setDate(startDate.getDate() + estimatedDaysToComplete);
+            const estimatedCompletionDate = new Date();
+            const ETC_UP = new Date();
+            const ETC_DOWN = new Date();
+
+            estimatedCompletionDate.setDate(estimatedCompletionDate.getDate() + estimatedDaysToComplete);
+            ETC_UP.setDate(ETC_UP.getDate() + estimatedUpper_bound_daysToComplete)
+            ETC_DOWN.setDate(ETC_DOWN.getDate() + estimatedLower_bound_daysToComplete)
 
             const formattedCompletionDate = estimatedCompletionDate.toLocaleDateString('it-IT', {
                 weekday: 'long',
@@ -14929,8 +14939,21 @@
                 month: 'long',
                 year: 'numeric'
             });
+            const formattedCompletionDateUP = ETC_UP.toLocaleDateString('it-IT', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            const formattedCompletionDateDOWN = ETC_DOWN.toLocaleDateString('it-IT', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
 
-            // console.log('ETC:', formattedCompletionDate);
+
+           // console.log('ETC:', formattedCompletionDate);
 
 
 
@@ -14941,6 +14964,11 @@
             const ul = document.createElement("ul");
 
             // Create list items for each statistic
+
+            const KanjileftItem = document.createElement("li");
+            KanjileftItem.textContent = "# Left: " + kanjiLeft;
+            ul.appendChild(KanjileftItem);
+
             const medianItem = document.createElement("li");
             medianItem.textContent = "Median: " + median.toFixed(2);
             ul.appendChild(medianItem);
@@ -14957,9 +14985,18 @@
             modeItem.textContent = "Mode: " + mode;
             ul.appendChild(modeItem);
 
+
+            const estimatedCompletionDateItemDOWN = document.createElement("li");
+            estimatedCompletionDateItemDOWN.textContent = "-: " + formattedCompletionDateDOWN + " (" + (kanjiLeft/estimatedLower_bound_daysToComplete).toFixed(2) +  ")";
+            ul.appendChild(estimatedCompletionDateItemDOWN);
+
             const estimatedCompletionDateItem = document.createElement("li");
-            estimatedCompletionDateItem.textContent = "ETC: " + formattedCompletionDate;
+            estimatedCompletionDateItem.textContent = "ETC: " + formattedCompletionDate  + " (" + median + ")";
             ul.appendChild(estimatedCompletionDateItem);
+
+            const estimatedCompletionDateItemUP = document.createElement("li");
+            estimatedCompletionDateItemUP.textContent = "+: " + formattedCompletionDateUP  + " (" + (kanjiLeft/estimatedUpper_bound_daysToComplete).toFixed(2) +  ")";
+            ul.appendChild(estimatedCompletionDateItemUP);
 
             // Set the content of the "stats" element to the created list
             statsElement.innerHTML = "";
