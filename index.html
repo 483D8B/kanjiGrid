@@ -1,4 +1,4 @@
-<!-- version 7 (more squared cells using line-height) 19/02/2024 -->
+<!-- version 7 (more squared cells using line-height) 04/03/2024 -->
 <!DOCTYPE html>
 <html>
 <!-- https://moderncss.dev/pure-css-custom-checkbox-style/ -->
@@ -14858,6 +14858,11 @@
             });
 
 
+            const lastDay = labels[labels.length - 1];
+
+            // Get the value corresponding to the last key
+            const lastValue = Differences[lastDay];
+
             // Calculate statistics
             const sum = values.reduce((acc, value) => acc + value, 0);
             const count = values.length;  // total number of revision days
@@ -14964,6 +14969,10 @@
             const ul = document.createElement("ul");
 
             // Create list items for each statistic
+
+            const daysPassed = document.createElement("li");
+            daysPassed.textContent = lastDay + " days passed " + "(≈ " + Math.floor(lastDay / 30.4375) +" months and " + Math.floor((lastDay % 30.4375) / 7) + " weeks)"
+            ul.appendChild(daysPassed);
 
             const KanjileftItem = document.createElement("li");
             KanjileftItem.textContent = "# Left: " + kanjiLeft;
