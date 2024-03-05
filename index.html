@@ -9,8 +9,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://483d8b.pythonanywhere.com/leitner.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="kanji-canvas.min.js"></script>
-    <script src="ref-patterns.js"></script>
+    <script src="resources\javascript\kanji-canvas.js"></script>
+    <script src="resources\javascript\ref-patterns.js"></script>
     <script src="readings.js"></script>
     <script src="wanakana.min.js"></script>
 
@@ -15274,15 +15274,15 @@
 
 
             const estimatedCompletionDateItemDOWN = document.createElement("li");
-            estimatedCompletionDateItemDOWN.textContent = "-: " + formattedCompletionDateDOWN + " (" + (kanjiLeft / estimatedLower_bound_daysToComplete).toFixed(2) + ")";
+            estimatedCompletionDateItemDOWN.textContent = "-: " + formattedCompletionDateDOWN + " (" + estimatedLower_bound_daysToComplete + " days at " + (kanjiLeft / estimatedLower_bound_daysToComplete).toFixed(2) + " 漢字 per days)";
             ul.appendChild(estimatedCompletionDateItemDOWN);
 
             const estimatedCompletionDateItem = document.createElement("li");
-            estimatedCompletionDateItem.textContent = "ETC: " + formattedCompletionDate + " (" + median + ")";
+            estimatedCompletionDateItem.textContent = "ETC: " + formattedCompletionDate + " (" + estimatedDaysToComplete + " days at " + median + " 漢字 per days)";
             ul.appendChild(estimatedCompletionDateItem);
 
             const estimatedCompletionDateItemUP = document.createElement("li");
-            estimatedCompletionDateItemUP.textContent = "+: " + formattedCompletionDateUP + " (" + (kanjiLeft / estimatedUpper_bound_daysToComplete).toFixed(2) + ")";
+            estimatedCompletionDateItemUP.textContent = "+: " + formattedCompletionDateUP + " (" + estimatedUpper_bound_daysToComplete + " days at " + (kanjiLeft / estimatedUpper_bound_daysToComplete).toFixed(2) + " 漢字 per days)";
             ul.appendChild(estimatedCompletionDateItemUP);
 
             // Set the content of the "stats" element to the created list
