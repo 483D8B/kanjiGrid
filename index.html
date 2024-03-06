@@ -1,4 +1,4 @@
-<!-- version 8 (added readings, both with searching feature and showing) 05/03/2024 -->
+<!-- version 8 (added readings, both with searching feature and showing) 06/03/2024 -->
 <!DOCTYPE html>
 <html>
 <!-- https://moderncss.dev/pure-css-custom-checkbox-style/ -->
@@ -9,10 +9,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://483d8b.pythonanywhere.com/leitner.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="kanji-canvas.min.js"></script>
+    <script src="kanji-canvas.js"></script>
     <script src="ref-patterns.js"></script>
     <script src="readings.js"></script>
     <script src="wanakana.min.js"></script>
+    <script src="vocabulary.js"></script>
 
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
@@ -88,9 +89,28 @@
             background-color: #A06D7F;
             color: white;
             border-radius: 0.5em;
+            border: 1px solid black;
+            margin: 1px;
         }
 
         .readings-label {
+            font-weight: bold;
+            color: black;
+            text-decoration: underline;
+        }
+
+        .vocabulary {
+            font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+            padding: 0.5em;
+            font-weight: 600;
+            background-color: #75D1B3;
+            color: white;
+            border-radius: 0.5em;
+            border: 1px solid black;
+            margin: 1px;
+        }
+
+        .vocab-label {
             font-weight: bold;
             color: black;
             text-decoration: underline;
@@ -437,6 +457,23 @@
             background-color: #8d5869;
         }
 
+        #showVocabulary {
+            background-color: #75D1B3;
+            border-radius: 15px;
+            border: 2px solid black;
+            margin-right: 5px;
+            float: right;
+            padding: 5px;
+            font-family: Verdana, sans-serif;
+            color: white;
+            font-size: 1em;
+        }
+
+
+        #showVocabulary:active {
+            background-color: #2A7F62;
+        }
+
         .progress_bg {
             background: none repeat scroll 0% 0% #75D1B3;
             border-radius: 10px;
@@ -741,6 +778,21 @@
             background-color: #8d5869;
             color: #36C;
         }
+
+        #gotoBtn {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin-top: 0.2em;
+            margin-left: 0.2em;
+            text-align: center;
+            background-color: #A06D7F;
+            border: 2px solid black;
+            margin-right: 5px;
+            padding: 2px;
+            font-family: Verdana, sans-serif;
+            color: white;
+        }
     </style>
 </head>
 
@@ -789,6 +841,7 @@
         <div class="settings-item">
             <button id="showKeyword">Show keyword</button>
             <button id="showReadings">Show readings</button>
+            <button id="showVocabulary">Show vocabulary</button>
         </div>
 
         <div class="settings-item">
@@ -842,6 +895,8 @@
             <button class="buttonCanvas" onclick="KanjiCanvas.recognize('can')" title="(CTRL+F)">Recognize</button>
         </div>
     </div>
+
+    <button id="gotoBtn">last</button>
 
 
     </p>
@@ -14554,8 +14609,10 @@
             const $forgottenCheckbox = document.getElementById("forgotten");
             const $showKeyword = $("#showKeyword");
             const $showReadings = $("#showReadings");
+            const $showVocabulary = $("#showVocabulary");
             let showKeywordState = false;
             let showReadingsState = false;
+            let showVocabularyState = false;
 
             const $enableSelectionCheckbox = document.getElementById("enableSelection");
             const $searchInput = $("#mySearch"); // Define $searchInput as a jQuery object
@@ -14631,30 +14688,50 @@
                 }
             });
 
+            // Function to retrieve pronunciation from Kanjidic
+            function getPronunciation(kanji) {
+                // Find the entry in the readings array corresponding to the given kanji
+                let kanjiEntry = readings.find(entry => entry.literal === kanji);
+
+                if (kanjiEntry) {
+                    let pronunciation = "";
+                    // Extract ja_on pronunciations
+                    if (kanjiEntry.ja_on && kanjiEntry.ja_on.length > 0) {
+                        pronunciation += "<span class='readings-label'>On readings:</span><br>" + "◦ " + kanjiEntry.ja_on.map(pron => pron.replace(/,/g, "")).join("<br>◦ ");
+                    }
+                    // Extract ja_kun pronunciations
+                    if (kanjiEntry.ja_kun && kanjiEntry.ja_kun.length > 0) {
+                        pronunciation += (pronunciation.length > 0 ? "<br>" : "") + "<span class='readings-label'>Kun readings:</span><br>" + "‣ " + kanjiEntry.ja_kun.map(pron => pron.replace(/,/g, "")).join("<br>‣ ");
+                    }
+                    return pronunciation;
+                } else {
+                    return "Pronunciation data not found for " + kanji;
+                }
+            }
+
+            // Function to retrieve vocabulary from vocabulary.js
+            function getVocabulary(kanji) {
+                // Find the entry in the vocabulary object corresponding to the given kanji
+                let vocabList = vocabulary[kanji];
+
+                if (vocabList) {
+                    let vocab = "<span class='vocab-label'>Vocabulary:</span><br>";
+                    // Extract words and translations
+                    vocabList.forEach((entry, index) => {
+                        vocab += `${entry.word} - ${entry.translation}<br>`;
+                    });
+                    return vocab;
+                } else {
+                    return "Vocabulary data not found for " + kanji;
+                }
+            }
+
+
             // Toggle visibility of keyword cells
             $showReadings.click(function () {
                 // Toggle the state
                 showReadingsState = !showReadingsState;
-                // Function to retrieve pronunciation from Kanjidic
-                function getPronunciation(kanji) {
-                    // Find the entry in the readings array corresponding to the given kanji
-                    let kanjiEntry = readings.find(entry => entry.literal === kanji);
 
-                    if (kanjiEntry) {
-                        let pronunciation = "";
-                        // Extract ja_on pronunciations
-                        if (kanjiEntry.ja_on && kanjiEntry.ja_on.length > 0) {
-                            pronunciation += "<span class='readings-label'>On readings:</span><br>" + "◦ " + kanjiEntry.ja_on.map(pron => pron.replace(/,/g, "")).join("<br>◦ ");
-                        }
-                        // Extract ja_kun pronunciations
-                        if (kanjiEntry.ja_kun && kanjiEntry.ja_kun.length > 0) {
-                            pronunciation += (pronunciation.length > 0 ? "<br>" : "") + "<span class='readings-label'>Kun readings:</span><br>" + "‣ " + kanjiEntry.ja_kun.map(pron => pron.replace(/,/g, "")).join("<br>‣ ");
-                        }
-                        return pronunciation;
-                    } else {
-                        return "Pronunciation data not found for " + kanji;
-                    }
-                }
 
                 // Change button text based on the state
                 if (showReadingsState) {
@@ -14681,6 +14758,42 @@
 
                         // Append the pronunciation to the cell
                         $(this).append("<div class='readings'>" + pronunciation + "</div>");
+                    }
+                });
+
+            });
+
+            // Toggle visibility of keyword cells
+            $showVocabulary.click(function () {
+                // Toggle the state
+                showVocabularyState = !showVocabularyState;
+
+
+                // Change button text based on the state
+                if (showVocabularyState) {
+                    $(this).text("Hide vocabulary");
+                } else {
+                    $(this).text("Show vocabulary");
+                }
+
+
+                // Iterate over each visible divTableCell element
+                $(".divTableCell").each(function () {
+                    // Extract the kanji text from the cell
+                    var kanjiText = $(this).find('.kanji').text().trim();
+
+                    // Check if pronunciation already exists
+                    var $vocabElement = $(this).find('.vocabulary');
+
+                    if ($vocabElement.length) {
+                        // If pronunciation exists, remove it to toggle
+                        $vocabElement.remove();
+                    } else {
+                        // Retrieve the pronunciation for the kanji
+                        var vocab = getVocabulary(kanjiText);
+
+                        // Append the pronunciation to the cell
+                        $(this).append("<div class='vocabulary'>" + vocab + "</div>");
                     }
                 });
 
@@ -15295,7 +15408,26 @@
                 // Toggle the visibility of the container
                 var container = document.getElementById("kanjiCanvasContainer");
                 container.style.display = container.style.display === "none" ? "block" : "none";
+
+                // Change the text of the button based on the container's visibility
+                var button = document.getElementById("draw");
+                button.innerText = container.style.display === "none" ? "Draw!" : "Close canvas";
             });
+
+            document.getElementById("gotoBtn").addEventListener("click", function () {
+                const index = kanjiStudiedTillNow + 1;
+                const elementToFocus = document.getElementById(index);
+                let end = document.getElementById('fileSlider').max;
+                $fileSlider.val(end).trigger("input");
+
+                // Focus on the element
+                elementToFocus.focus();
+
+                // Scroll the page to the focused element
+                elementToFocus.scrollIntoView();
+
+            });
+
 
             // const dataset = Object.values(Differences);
             // console.log(dataset)
