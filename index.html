@@ -793,6 +793,14 @@
             font-family: Verdana, sans-serif;
             color: white;
         }
+
+        .small-li {
+            font-size: 0.7em;
+        }
+
+        .medium-li {
+            font-size: 0.8em;
+        }
     </style>
 </head>
 
@@ -15301,6 +15309,8 @@
             // Calculate kurtosis for a sample
             const kurtosis = ((count * (count + 1)) / ((count - 1) * (count - 2) * (count - 3))) * values.reduce((acc, value) => acc + Math.pow((value - average) / sampleStandardDeviation, 4), 0) - (3 * Math.pow((count - 1), 2)) / ((count - 2) * (count - 3));
 
+            const kanjiStudiedLastTime = Differences[Object.keys(Differences).pop()];
+
             // console.log("Median:", median);
             // console.log("Average:", average);
             // console.log("Standard Deviation:", sampleStandardDeviation );
@@ -15314,6 +15324,8 @@
             // Calculate the estimated number of days needed to complete all kanji
             const estimatedDaysToComplete = kanjiLeft / median;
 
+            const estimatedDaysToCompleteIfKeepGoing = kanjiLeft / kanjiStudiedLastTime;
+
 
             // Calculate the estimated number of days needed to complete all kanji
             const estimatedLower_bound_daysToComplete = Math.ceil(estimatedDaysToComplete - sampleStandardDeviation); // Round up to the nearest whole day
@@ -15324,10 +15336,13 @@
             const estimatedCompletionDate = new Date();
             const ETC_UP = new Date();
             const ETC_DOWN = new Date();
+            const estimatedCompletionDateIfKeepGoing = new Date();
 
             estimatedCompletionDate.setDate(estimatedCompletionDate.getDate() + estimatedDaysToComplete);
             ETC_UP.setDate(ETC_UP.getDate() + estimatedUpper_bound_daysToComplete)
             ETC_DOWN.setDate(ETC_DOWN.getDate() + estimatedLower_bound_daysToComplete)
+            estimatedCompletionDateIfKeepGoing.setDate(estimatedCompletionDateIfKeepGoing.getDate() + estimatedDaysToCompleteIfKeepGoing);
+
 
             const formattedCompletionDate = estimatedCompletionDate.toLocaleDateString('it-IT', {
                 weekday: 'long',
@@ -15342,6 +15357,13 @@
                 year: 'numeric'
             });
             const formattedCompletionDateDOWN = ETC_DOWN.toLocaleDateString('it-IT', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const formattedCompletionDateIfKeepGoing = estimatedCompletionDateIfKeepGoing.toLocaleDateString('it-IT', {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
@@ -15386,16 +15408,25 @@
             ul.appendChild(modeItem);
 
 
+
+            const whatIfIContinueLikeThis = document.createElement("li");
+            whatIfIContinueLikeThis.textContent = "ETC ⭐: " + formattedCompletionDateIfKeepGoing + " (" + kanjiLeft / kanjiStudiedLastTime + " days at " + kanjiStudiedLastTime + " 漢字 per days)";
+            whatIfIContinueLikeThis.classList.add("medium-li");
+            ul.appendChild(whatIfIContinueLikeThis);
+
             const estimatedCompletionDateItemDOWN = document.createElement("li");
             estimatedCompletionDateItemDOWN.textContent = "-: " + formattedCompletionDateDOWN + " (" + estimatedLower_bound_daysToComplete + " days at " + (kanjiLeft / estimatedLower_bound_daysToComplete).toFixed(2) + " 漢字 per days)";
+            estimatedCompletionDateItemDOWN.classList.add("small-li");
             ul.appendChild(estimatedCompletionDateItemDOWN);
 
             const estimatedCompletionDateItem = document.createElement("li");
             estimatedCompletionDateItem.textContent = "ETC: " + formattedCompletionDate + " (" + estimatedDaysToComplete + " days at " + median + " 漢字 per days)";
+            estimatedCompletionDateItem.classList.add("small-li");
             ul.appendChild(estimatedCompletionDateItem);
 
             const estimatedCompletionDateItemUP = document.createElement("li");
             estimatedCompletionDateItemUP.textContent = "+: " + formattedCompletionDateUP + " (" + estimatedUpper_bound_daysToComplete + " days at " + (kanjiLeft / estimatedUpper_bound_daysToComplete).toFixed(2) + " 漢字 per days)";
+            estimatedCompletionDateItemUP.classList.add("small-li");
             ul.appendChild(estimatedCompletionDateItemUP);
 
             // Set the content of the "stats" element to the created list
