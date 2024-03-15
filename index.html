@@ -14,6 +14,7 @@
     <script src="readings.js"></script>
     <script src="wanakana.min.js"></script>
     <script src="vocabulary.js"></script>
+    <script src="stories.js"></script>
 
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
@@ -111,6 +112,22 @@
         }
 
         .vocab-label {
+            font-weight: bold;
+            color: black;
+            text-decoration: underline;
+        }
+
+        .story {
+            padding: 0.5em;
+            background-color: #b4ace6;
+            color: black;
+            border-radius: 0.5em;
+            border: 1px solid black;
+            margin: 1px;
+            white-space: pre-line;
+        }
+
+        .story-label {
             font-weight: bold;
             color: black;
             text-decoration: underline;
@@ -472,6 +489,23 @@
 
         #showVocabulary:active {
             background-color: #2A7F62;
+        }
+
+        #showStory {
+            background-color: #b4ace6;
+            border-radius: 15px;
+            border: 2px solid black;
+            margin-right: 5px;
+            float: right;
+            padding: 5px;
+            font-family: Verdana, sans-serif;
+            color: white;
+            font-size: 1em;
+        }
+
+
+        #showStory:active {
+            background-color: #483d8b;
         }
 
         .progress_bg {
@@ -850,6 +884,7 @@
             <button id="showKeyword">Show keyword</button>
             <button id="showReadings">Show readings</button>
             <button id="showVocabulary">Show vocabulary</button>
+            <button id="showStory">Show stories</button>
         </div>
 
         <div class="settings-item">
@@ -14618,9 +14653,11 @@
             const $showKeyword = $("#showKeyword");
             const $showReadings = $("#showReadings");
             const $showVocabulary = $("#showVocabulary");
+            const $showStory = $("#showStory");
             let showKeywordState = false;
             let showReadingsState = false;
             let showVocabularyState = false;
+            let showStoryState = false;
 
             const $enableSelectionCheckbox = document.getElementById("enableSelection");
             const $searchInput = $("#mySearch"); // Define $searchInput as a jQuery object
@@ -14734,6 +14771,19 @@
                 }
             }
 
+            // Function to retrieve vocabulary from vocabulary.js
+            function getStory(kanji) {
+                // Find the entry in the vocabulary object corresponding to the given kanji
+                let story = stories[kanji];
+
+
+                if (story) {
+                    return `<span class='story-label'>Story:</span><br>${story}`;
+                } else {
+                    return "Story data not found for " + kanji;
+                }
+            }
+
 
             // Toggle visibility of keyword cells
             $showReadings.click(function () {
@@ -14771,7 +14821,7 @@
 
             });
 
-            // Toggle visibility of keyword cells
+            // Toggle visibility of vocabulary cells
             $showVocabulary.click(function () {
                 // Toggle the state
                 showVocabularyState = !showVocabularyState;
@@ -14806,6 +14856,59 @@
                 });
 
             });
+
+
+            // Toggle visibility of stories cells
+            $showStory.click(function () {
+                // Toggle the state
+                showStoryState = !showStoryState;
+
+
+                // Change button text based on the state
+                $(this).text(showStoryState ? "Hide stories" : "Show stories");
+
+                // Iterate over each visible divTableCell element
+                $(".divTableCell").each(function () {
+
+                    // Modify the border and margin based on the state
+                    if (showStoryState) {
+                        $(this).css({
+                            "border": "2px solid #2a2452",  // Example: sets a blue border with a thickness of 2px
+                            "margin": "5px",  // Example: sets a margin of 5px
+                        });
+                    } else {
+                        $(this).css({
+                            "border": "",  // Remove border
+                            "margin": "",  // Remove margin
+                        });
+                    }
+
+                    // Extract the kanji text from the cell
+                    var kanjiText = $(this).find('.kanji').text().trim();
+
+                    // Check if story already exists
+                    var $storyElement = $(this).find('.story');
+
+                    if ($storyElement.length && !showStoryState) {
+                        // If story exists and state is false (hide stories), remove it
+                        $storyElement.remove();
+                    } else if (!showStoryState) {
+                        // If state is false (hide stories), ensure border is removed
+                        $(this).css("border", "");
+                    } else {
+                        // Retrieve the story for the kanji
+                        var story = getStory(kanjiText);
+
+                        // Replace words between asterisks with italics and words between hash symbols with bold
+                        story = story.replace(/\*(.*?)\*/g, "<i>$1</i>").replace(/#(.*?)#/g, "<b>$1</b>");
+
+                        // Append the pronunciation to the cell
+                        $(this).append("<div class='story'>" + story + "</div>");
+                    }
+                });
+
+            });
+
 
             // Get all elements with class "kanji"
             const kanjiElements = document.querySelectorAll('.kanji');
