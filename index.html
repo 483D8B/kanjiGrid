@@ -125,6 +125,11 @@
             border: 1px solid black;
             margin: 1px;
             white-space: pre-line;
+            overflow-wrap: break-word;
+            max-width: 45vw;
+            /* Adjust the maximum height as needed */
+            overflow-y: auto;
+            /* Enable vertical scrollbar if content exceeds maximum height */
         }
 
         .story-label {
@@ -890,7 +895,7 @@
             <button id="showStory">Show stories</button>
         </div>
 
-        
+
 
         <div class="settings-item">
             <div id="nOfKanjiADay">漢字: 0</div>
