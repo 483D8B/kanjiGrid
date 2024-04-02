@@ -15002,7 +15002,7 @@
             // Handle slider change event
             $fileSlider.on("input", function () {
                 const sliderValue = $(this).val();
-                const datasetKeys = Object.keys(leitnerData);
+                const datasetKeys = Object.keys(leitnerData).filter(key => key !== "koohii_2023-09-12"); // Exclude the key "koohii_2023-09-12"
 
                 const clampedValue = Math.min(Math.max(1, sliderValue), datasetKeys.length);
                 const datasetIndex = clampedValue - 1;
