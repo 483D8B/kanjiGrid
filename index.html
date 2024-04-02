@@ -14609,7 +14609,9 @@
         // Define the updateDateDisplay function globally
         function updateDateDisplay(selectedDataset) {
             const dateElement = $("#datasetDate");
-            const datasetDates = Object.keys(leitnerData).map(dataset => ({
+            const datasetDates = Object.keys(leitnerData)
+            .filter(dataset => dataset !== "koohii_2023-09-12") // NB! Exclude this key used only to calculate retention for the first day (it not contains meaningful results)
+            .map(dataset => ({
                 name: dataset,
                 date: dataset.replace("koohii_", "")
             }));
@@ -14675,7 +14677,7 @@
 
             const Readings = { 1: 3 }
 
-            const numberOfDatasets = Object.keys(leitnerData).length;
+            const numberOfDatasets = Object.keys(leitnerData).length-1; //-1 because there is the "dummy" object koohii_2023-09-12
 
             document.getElementById("zoomSlider").defaultValue = 1
 
