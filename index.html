@@ -15043,7 +15043,7 @@
                         point: {
                             borderWidth: 0, //not working
                             pointBorderColor: 'transparent',
-                            radius: 4,
+                            radius: 2,
                         }
                     },
                     scales: {
@@ -15112,6 +15112,9 @@
                 // Remove existing vertical line annotations
                 myChart.options.plugins.annotation.annotations = [];
 
+                // Remove existing vertical line annotations
+                retentionChart.options.plugins.annotation.annotations = [];
+
                 // Add a new horizontal line annotation at the selected day
                 myChart.options.plugins.annotation.annotations.push({
                     type: 'line',
@@ -15138,11 +15141,25 @@
                     }
                 });
 
-
+                // Add a new vertical line annotation at the selected day
+                retentionChart.options.plugins.annotation.annotations.push({
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'x',
+                    value: sliderValue - 2, // The day value from the slider
+                    borderColor: 'blue', // Adjust the color as needed
+                    borderWidth: 2,
+                    label: {
+                        content: sliderValue, // Label for the line
+                        enabled: true,
+                        position: 'center', // Adjust the position as needed
+                    }
+                });
 
 
                 // Update the chart to apply the changes
                 myChart.update();
+                retentionChart.update();
 
             });
 
