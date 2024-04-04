@@ -17,7 +17,9 @@
     <script src="wanakana.min.js"></script>
     <script src="vocabulary.js" defer></script>
     <script src="stories.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js" defer></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"
+        defer></script>
     <link rel="preload" href="KanjiStrokeOrders.woff" as="font" type="font/woff" crossorigin>
 
 
@@ -1568,7 +1570,7 @@
 
 
                             // Display the count of filtered kanji
-                            console.log("Number of Kanji Filtered: " + filteredCount);
+                            //console.log("Number of Kanji Filtered: " + filteredCount);
                         }
                     }
 
@@ -1618,14 +1620,26 @@
                             });
                         });
 
-                        // Toggle visibility of elements based on found readings
-                        $(".divTableCell").each(function () {
-                            var kanjiText = $(this).find('.kanji').text().trim();
+                        // Get all elements with class 'divTableCell'
+                        var elements = document.getElementsByClassName('divTableCell');
+
+                        // Iterate over each element
+                        for (var i = 0; i < elements.length; i++) {
+                            // Get the 'kanji' element within the current 'divTableCell' element
+                            var kanjiElement = elements[i].getElementsByClassName('kanji')[0];
+
+                            // Get the text content of the 'kanji' element and trim any whitespace
+                            var kanjiText = kanjiElement.textContent.trim();
+
+                            // Check if the 'kanjiText' is found in 'foundReadings'
                             var found = foundReadings.some(function (reading) {
                                 return reading.literal === kanjiText;
                             });
-                            $(this).toggle(found);
-                        });
+
+                            // Toggle visibility of the current 'divTableCell' element based on 'found'
+                            elements[i].style.display = found ? 'block' : 'none';
+                        }
+
                     }
 
                     else {
@@ -1640,16 +1654,23 @@
                             var wholeWordFound = false;
                             var alphanumericRegex = /[\da-zA-Z]+/;
 
-                            $(".divTableCell").each(function () {
-                                var cellText = $(this).text().toLowerCase();
-                                // First, check for whole word matches
+                            // Get all elements with class 'divTableCell'
+                            var elements = document.getElementsByClassName('divTableCell');
+
+                            // Iterate over each element
+                            for (var i = 0; i < elements.length; i++) {
+                                // Get the text content of the current 'divTableCell' element and convert it to lowercase
+                                var cellText = elements[i].textContent.toLowerCase();
+
+                                // Initialize a flag for found matches
                                 var found = false;
 
-                                for (var i = 0; i < searchWords.length; i++) {
-                                    var word = searchWords[i];
+                                // Iterate over each word in 'searchWords'
+                                for (var j = 0; j < searchWords.length; j++) {
+                                    var word = searchWords[j];
 
                                     if (alphanumericRegex.test(word)) {
-                                        // Check if the word is alphanumeric
+                                        // If the word is alphanumeric, check for whole word matches
                                         var regex = new RegExp("\\b" + word + "\\b", "i");
                                         if (regex.test(cellText)) {
                                             found = true;
@@ -1663,35 +1684,47 @@
                                         }
                                     }
                                 }
-                                // Toggle the visibility of the element based on the match
-                                $(this).toggle(found);
 
-                                // Update the wholeWordFound flag
+                                // Toggle the visibility of the current 'divTableCell' element based on the match
+                                elements[i].style.display = found ? 'block' : 'none';
+
+                                // Update the 'wholeWordFound' flag
                                 if (found) {
                                     wholeWordFound = true;
                                 }
-                            });
+                            }
+
 
                             if (!wholeWordFound) {
                                 // If no whole word matches were found, show partial matches
-                                $(".divTableCell").each(function () {
-                                    var cellText = $(this).text().toLowerCase();
+                                // Get all elements with class 'divTableCell'
+                                var elements = document.getElementsByClassName('divTableCell');
+
+                                // Iterate over each element
+                                for (var i = 0; i < elements.length; i++) {
+                                    // Get the text content of the current 'divTableCell' element and convert it to lowercase
+                                    var cellText = elements[i].textContent.toLowerCase();
+
+                                    // Initialize a flag for found matches
                                     var found = false;
 
-                                    for (var i = 0; i < searchWords.length; i++) {
-                                        var word = searchWords[i];
+                                    // Iterate over each word in 'searchWords'
+                                    for (var j = 0; j < searchWords.length; j++) {
+                                        var word = searchWords[j];
 
                                         if (alphanumericRegex.test(word)) {
-                                            // Check if the word is alphanumeric
+                                            // If the word is alphanumeric, check for partial matches
                                             if (cellText.includes(word)) {
                                                 found = true;
                                                 break;
                                             }
                                         }
                                     }
-                                    // Toggle the visibility of the element based on partial match
-                                    $(this).toggle(found);
-                                });
+
+                                    // Toggle the visibility of the current 'divTableCell' element based on the match
+                                    elements[i].style.display = found ? 'block' : 'none';
+                                }
+
                             }
                         }
                     }
@@ -1975,6 +2008,19 @@
                 });
 
 
+                // Update cell colors based on the Failures object
+                function updateForgotten() {
+                    const divTableCells = document.querySelectorAll(".divTableCell");
+                    if (forgottenCheckbox.checked) {
+                        divTableCells.forEach((cell) => {
+                            const cellId = cell.id;
+                            if (Failures[cellId] >= 1) {
+                                cell.style.backgroundColor = getBackgroundColorForFailures(Failures[cellId]);
+                            }
+                        });
+                    }
+                }
+
 
             });  //end doc ready
 
@@ -2059,18 +2105,6 @@
                 element.style.backgroundColor = backgroundColor;
             }
 
-            // Update cell colors based on the Failures object
-            function updateForgotten() {
-                const divTableCells = document.querySelectorAll(".divTableCell");
-                if (forgottenCheckbox.checked) {
-                    divTableCells.forEach((cell) => {
-                        const cellId = cell.id;
-                        if (Failures[cellId] >= 1) {
-                            cell.style.backgroundColor = getBackgroundColorForFailures(Failures[cellId]);
-                        }
-                    });
-                }
-            }
 
 
             // Function to retrieve pronunciation from Kanjidic
