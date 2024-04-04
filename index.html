@@ -1038,55 +1038,6 @@
                 tableBody.appendChild(divTableCell);
             }
 
-            // Define the updateDateDisplay function globally
-            function updateDateDisplay(selectedDataset) {
-                const dateElement = document.querySelector("#datasetDate");
-                const datasetDates = Object.keys(leitnerData).map(dataset => ({
-                    name: dataset,
-                    date: dataset.replace("koohii_", "")
-                }));
-
-                const selectedDateObj = datasetDates.find(datasetObj => datasetObj.name === selectedDataset);
-                var dateText;
-
-                if (selectedDateObj.date == "origin") {
-                    dateText = "Slide to see progress";
-                    document.querySelector("#selectedDayLabel").textContent = "";
-                    document.querySelector("#nOfKanjiADay").textContent = "";
-                }
-                else {
-                    dateText = selectedDateObj ? `${formatDateToDateString(new Date(selectedDateObj.date))}` : "No data ( •_•)";
-                    document.querySelector("#selectedDayLabel").textContent = `${dateText}`;
-                }
-
-                dateElement.textContent = dateText;
-            }
-            // Function to format the date similar to toDateString
-            function formatDateToDateString(date) {
-                const months = [
-                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-                ];
-                const year = date.getFullYear();
-                const month = months[date.getMonth()];
-                const day = date.getDate();
-                return `${month} ${day}, ${year}`;
-            }
-
-            // Function to map Failures values to background colors using the object
-            function getBackgroundColorForFailures(failures) {
-                const valueToBackgroundColorForgotten = {
-                    1: "#a29897",
-                    2: "#645452",
-                    3: "#504342",
-                    4: "#322a29",
-                    default: "#282221"
-                };
-
-                return valueToBackgroundColorForgotten[failures] || valueToBackgroundColorForgotten.default;
-            }
-
-
 
             document.addEventListener("DOMContentLoaded", function () {
                 const KanjiTotal = 2273;
@@ -1118,48 +1069,6 @@
                 document.querySelector("#fileSlider").setAttribute("max", numberOfDatasets);
 
 
-                // Define constants for background colors
-                const valueToBackgroundColorKanji = {
-                    1: "#FFFFFF", //consider added as not studied for now for consistency(waiting to figure out how to handle it)
-                    2: "#E67373",
-                    3: "#E6C973",
-                    4: "#ACE673",
-                    5: "#73E690",
-                    6: "#73E6E6",
-                    7: "#7390E6",
-                    8: "#AC73E6",
-                    9: "#EE82EE",
-                    100: "#645452",
-                    default: "#FFFFFF"  // Default background color
-                };
-
-                const valueToBackgroundColorForgotten = {
-                    1: "#a29897",
-                    2: "#645452",
-                    3: "#504342",
-                    4: "#322a29",
-                    default: "#282221"
-                };
-
-                // Set the initial background color
-                function setBackgroundColor(element, value) {
-                    const backgroundColor = valueToBackgroundColorKanji[value] || valueToBackgroundColorKanji.default;
-                    element.style.backgroundColor = backgroundColor;
-                }
-
-                // Update cell colors based on the Failures object
-                function updateForgotten() {
-                    const divTableCells = document.querySelectorAll(".divTableCell");
-                    if (forgottenCheckbox.checked) {
-                        divTableCells.forEach((cell) => {
-                            const cellId = cell.id;
-                            if (Failures[cellId] >= 1) {
-                                cell.style.backgroundColor = getBackgroundColorForFailures(Failures[cellId]);
-                            }
-                        });
-                    }
-                }
-
                 // Add an event listener to the "forgotten" checkbox
                 forgottenCheckbox.addEventListener("change", updateForgotten);
 
@@ -1181,62 +1090,6 @@
                     }
                 });
 
-
-// Function to retrieve pronunciation from Kanjidic
-function getPronunciation(kanji) {
-    // Find the entry in the readings array corresponding to the given kanji
-    let kanjiEntry = readings.find(entry => entry.literal === kanji);
-
-    if (kanjiEntry) {
-        let pronunciation = "";
-        // Extract ja_on pronunciations
-        if (kanjiEntry.ja_on && kanjiEntry.ja_on.length > 0) {
-            pronunciation += "<span class='readings-label'>On readings:</span><br>" + "◦ " + kanjiEntry.ja_on.map(pron => pron.replace(/,/g, "")).join("<br>◦ ");
-        }
-        // Extract ja_kun pronunciations
-        if (kanjiEntry.ja_kun && kanjiEntry.ja_kun.length > 0) {
-            pronunciation += (pronunciation.length > 0 ? "<br>" : "") + "<span class='readings-label'>Kun readings:</span><br>" + "‣ " + kanjiEntry.ja_kun.map(pron => pron.replace(/,/g, "")).join("<br>‣ ") + "<br>";
-        }
-        return pronunciation;
-    } else {
-        return "Pronunciation data not found for " + kanji;
-    }
-}
-
-
-
-
-
-
-                // Function to retrieve vocabulary from vocabulary.js
-                function getVocabulary(kanji) {
-                    // Find the entry in the vocabulary object corresponding to the given kanji
-                    let vocabList = vocabulary[kanji];
-
-                    if (vocabList) {
-                        let vocab = "<span class='vocab-label'>Vocabulary:</span><br>";
-                        // Extract words and translations
-                        vocabList.forEach((entry, index) => {
-                            vocab += `${entry.word} - ${entry.translation}<br>`;
-                        });
-                        return vocab;
-                    } else {
-                        return "Vocabulary data not found for " + kanji;
-                    }
-                }
-
-                // Function to retrieve vocabulary from vocabulary.js
-                function getStory(kanji) {
-                    // Find the entry in the vocabulary object corresponding to the given kanji
-                    let story = stories[kanji];
-
-
-                    if (story) {
-                        return `<span class='story-label'>Story:</span><br>${story}`;
-                    } else {
-                        return "Story data not found for " + kanji;
-                    }
-                }
 
 
                 // Toggle visibility of keyword cells
@@ -2107,6 +1960,152 @@ function getPronunciation(kanji) {
 
 
             });  //end doc ready
+
+
+                        // Define the updateDateDisplay function globally
+                        function updateDateDisplay(selectedDataset) {
+                const dateElement = document.querySelector("#datasetDate");
+                const datasetDates = Object.keys(leitnerData).map(dataset => ({
+                    name: dataset,
+                    date: dataset.replace("koohii_", "")
+                }));
+
+                const selectedDateObj = datasetDates.find(datasetObj => datasetObj.name === selectedDataset);
+                var dateText;
+
+                if (selectedDateObj.date == "origin") {
+                    dateText = "Slide to see progress";
+                    document.querySelector("#selectedDayLabel").textContent = "";
+                    document.querySelector("#nOfKanjiADay").textContent = "";
+                }
+                else {
+                    dateText = selectedDateObj ? `${formatDateToDateString(new Date(selectedDateObj.date))}` : "No data ( •_•)";
+                    document.querySelector("#selectedDayLabel").textContent = `${dateText}`;
+                }
+
+                dateElement.textContent = dateText;
+            }
+            // Function to format the date similar to toDateString
+            function formatDateToDateString(date) {
+                const months = [
+                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                ];
+                const year = date.getFullYear();
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                return `${month} ${day}, ${year}`;
+            }
+
+            // Function to map Failures values to background colors using the object
+            function getBackgroundColorForFailures(failures) {
+                const valueToBackgroundColorForgotten = {
+                    1: "#a29897",
+                    2: "#645452",
+                    3: "#504342",
+                    4: "#322a29",
+                    default: "#282221"
+                };
+
+                return valueToBackgroundColorForgotten[failures] || valueToBackgroundColorForgotten.default;
+            }
+
+
+
+            // Define constants for background colors
+            const valueToBackgroundColorKanji = {
+                1: "#FFFFFF", //consider added as not studied for now for consistency(waiting to figure out how to handle it)
+                2: "#E67373",
+                3: "#E6C973",
+                4: "#ACE673",
+                5: "#73E690",
+                6: "#73E6E6",
+                7: "#7390E6",
+                8: "#AC73E6",
+                9: "#EE82EE",
+                100: "#645452",
+                default: "#FFFFFF"  // Default background color
+            };
+
+            const valueToBackgroundColorForgotten = {
+                1: "#a29897",
+                2: "#645452",
+                3: "#504342",
+                4: "#322a29",
+                default: "#282221"
+            };
+
+
+            // Set the initial background color
+            function setBackgroundColor(element, value) {
+                const backgroundColor = valueToBackgroundColorKanji[value] || valueToBackgroundColorKanji.default;
+                element.style.backgroundColor = backgroundColor;
+            }
+
+            // Update cell colors based on the Failures object
+            function updateForgotten() {
+                const divTableCells = document.querySelectorAll(".divTableCell");
+                if (forgottenCheckbox.checked) {
+                    divTableCells.forEach((cell) => {
+                        const cellId = cell.id;
+                        if (Failures[cellId] >= 1) {
+                            cell.style.backgroundColor = getBackgroundColorForFailures(Failures[cellId]);
+                        }
+                    });
+                }
+            }
+
+
+            // Function to retrieve pronunciation from Kanjidic
+            function getPronunciation(kanji) {
+                // Find the entry in the readings array corresponding to the given kanji
+                let kanjiEntry = readings.find(entry => entry.literal === kanji);
+
+                if (kanjiEntry) {
+                    let pronunciation = "";
+                    // Extract ja_on pronunciations
+                    if (kanjiEntry.ja_on && kanjiEntry.ja_on.length > 0) {
+                        pronunciation += "<span class='readings-label'>On readings:</span><br>" + "◦ " + kanjiEntry.ja_on.map(pron => pron.replace(/,/g, "")).join("<br>◦ ");
+                    }
+                    // Extract ja_kun pronunciations
+                    if (kanjiEntry.ja_kun && kanjiEntry.ja_kun.length > 0) {
+                        pronunciation += (pronunciation.length > 0 ? "<br>" : "") + "<span class='readings-label'>Kun readings:</span><br>" + "‣ " + kanjiEntry.ja_kun.map(pron => pron.replace(/,/g, "")).join("<br>‣ ") + "<br>";
+                    }
+                    return pronunciation;
+                } else {
+                    return "Pronunciation data not found for " + kanji;
+                }
+            }
+
+            // Function to retrieve vocabulary from vocabulary.js
+            function getVocabulary(kanji) {
+                // Find the entry in the vocabulary object corresponding to the given kanji
+                let vocabList = vocabulary[kanji];
+
+                if (vocabList) {
+                    let vocab = "<span class='vocab-label'>Vocabulary:</span><br>";
+                    // Extract words and translations
+                    vocabList.forEach((entry, index) => {
+                        vocab += `${entry.word} - ${entry.translation}<br>`;
+                    });
+                    return vocab;
+                } else {
+                    return "Vocabulary data not found for " + kanji;
+                }
+            }
+
+            // Function to retrieve vocabulary from vocabulary.js
+            function getStory(kanji) {
+                // Find the entry in the vocabulary object corresponding to the given kanji
+                let story = stories[kanji];
+
+
+                if (story) {
+                    return `<span class='story-label'>Story:</span><br>${story}`;
+                } else {
+                    return "Story data not found for " + kanji;
+                }
+            }
 
 
         </script>
