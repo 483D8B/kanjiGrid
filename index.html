@@ -1040,7 +1040,7 @@
 
             // Define the updateDateDisplay function globally
             function updateDateDisplay(selectedDataset) {
-                const dateElement = $("#datasetDate");
+                const dateElement = document.querySelector("#datasetDate");
                 const datasetDates = Object.keys(leitnerData).map(dataset => ({
                     name: dataset,
                     date: dataset.replace("koohii_", "")
@@ -1050,16 +1050,16 @@
                 var dateText;
 
                 if (selectedDateObj.date == "origin") {
-                    dateText = "Slide to see progress"
-                    $("#selectedDayLabel").text(``);
-                    $("#nOfKanjiADay").text(``);
+                    dateText = "Slide to see progress";
+                    document.querySelector("#selectedDayLabel").textContent = "";
+                    document.querySelector("#nOfKanjiADay").textContent = "";
                 }
                 else {
                     dateText = selectedDateObj ? `${formatDateToDateString(new Date(selectedDateObj.date))}` : "No data ( •_•)";
-                    $("#selectedDayLabel").text(`${dateText}`);
+                    document.querySelector("#selectedDayLabel").textContent = `${dateText}`;
                 }
 
-                dateElement.text(dateText);
+                dateElement.textContent = dateText;
             }
             // Function to format the date similar to toDateString
             function formatDateToDateString(date) {
@@ -1088,25 +1088,25 @@
 
 
 
-            $(document).ready(function () {
+            document.addEventListener("DOMContentLoaded", function () {
                 const KanjiTotal = 2273;
-                const $fileSlider = $("#fileSlider");
-                const $zoomSlider = $("#zoomSlider");
-                const $settings = $('#settings');
-                const $closeSettingsBtn = $('#close-settings-btn');
-                const $forgottenCheckbox = document.getElementById("forgotten");
-                const $showKeyword = $("#showKeyword");
-                const $showReadings = $("#showReadings");
-                const $showVocabulary = $("#showVocabulary");
-                const $showStory = $("#showStory");
+                const fileSlider = document.querySelector("#fileSlider");
+                const zoomSlider = document.querySelector("#zoomSlider");
+                const settings = document.querySelector('#settings');
+                const closeSettingsBtn = document.querySelector('#close-settings-btn');
+                const forgottenCheckbox = document.getElementById("forgotten");
+                const showKeyword = document.querySelector("#showKeyword");
+                const showReadings = document.querySelector("#showReadings");
+                const showVocabulary = document.querySelector("#showVocabulary");
+                const showStory = document.querySelector("#showStory");
                 let showKeywordState = false;
                 let showReadingsState = false;
                 let showVocabularyState = false;
                 let showStoryState = false;
 
-                const $enableSelectionCheckbox = document.getElementById("enableSelection");
-                const $searchInput = $("#mySearch"); // Define $searchInput as a jQuery object
-                const $deleteButton = $("#deleteSearch"); // Define $deleteButton as a jQuery object
+                const enableSelectionCheckbox = document.getElementById("enableSelection");
+                const searchInput = document.querySelector("#mySearch"); // Define searchInput as a JavaScript object
+                const deleteButton = document.querySelector("#deleteSearch"); // Define deleteButton as a JavaScript object
 
                 const Readings = { 1: 3 }
 
@@ -1115,7 +1115,7 @@
                 document.getElementById("zoomSlider").defaultValue = 1
 
                 // Update the max attribute of the slider input element
-                $("#fileSlider").attr("max", numberOfDatasets);
+                document.querySelector("#fileSlider").setAttribute("max", numberOfDatasets);
 
 
                 // Define constants for background colors
@@ -1144,13 +1144,13 @@
                 // Set the initial background color
                 function setBackgroundColor(element, value) {
                     const backgroundColor = valueToBackgroundColorKanji[value] || valueToBackgroundColorKanji.default;
-                    element.css("background-color", backgroundColor);
+                    element.style.backgroundColor = backgroundColor;
                 }
 
                 // Update cell colors based on the Failures object
                 function updateForgotten() {
                     const divTableCells = document.querySelectorAll(".divTableCell");
-                    if ($forgottenCheckbox.checked) {
+                    if (forgottenCheckbox.checked) {
                         divTableCells.forEach((cell) => {
                             const cellId = cell.id;
                             if (Failures[cellId] >= 1) {
@@ -1161,43 +1161,52 @@
                 }
 
                 // Add an event listener to the "forgotten" checkbox
-                $forgottenCheckbox.addEventListener("change", updateForgotten);
+                forgottenCheckbox.addEventListener("change", updateForgotten);
 
                 // Toggle visibility of keyword cells
-                $showKeyword.click(function () {
-                    $(".keyword").toggle();
+                showKeyword.addEventListener('click', function () {
+                    const keywords = document.querySelectorAll(".keyword");
+                    keywords.forEach((keyword) => {
+                        keyword.style.display = keyword.style.display === 'none' ? '' : 'none';
+                    });
 
                     // Toggle the state
                     showKeywordState = !showKeywordState;
 
                     // Change button text based on the state
                     if (showKeywordState) {
-                        $(this).text("Hide keywords");
+                        this.textContent = "Hide keywords";
                     } else {
-                        $(this).text("Show keywords");
+                        this.textContent = "Show keywords";
                     }
                 });
 
-                // Function to retrieve pronunciation from Kanjidic
-                function getPronunciation(kanji) {
-                    // Find the entry in the readings array corresponding to the given kanji
-                    let kanjiEntry = readings.find(entry => entry.literal === kanji);
 
-                    if (kanjiEntry) {
-                        let pronunciation = "";
-                        // Extract ja_on pronunciations
-                        if (kanjiEntry.ja_on && kanjiEntry.ja_on.length > 0) {
-                            pronunciation += "<span class='readings-label'>On readings:</span><br>" + "◦ " + kanjiEntry.ja_on.map(pron => pron.replace(/,/g, "")).join("<br>◦ ");
-                        }
-                        // Extract ja_kun pronunciations
-                        if (kanjiEntry.ja_kun && kanjiEntry.ja_kun.length > 0) {
-                            pronunciation += (pronunciation.length > 0 ? "<br>" : "") + "<span class='readings-label'>Kun readings:</span><br>" + "‣ " + kanjiEntry.ja_kun.map(pron => pron.replace(/,/g, "")).join("<br>‣ ");
-                        }
-                        return pronunciation;
-                    } else {
-                        return "Pronunciation data not found for " + kanji;
-                    }
-                }
+// Function to retrieve pronunciation from Kanjidic
+function getPronunciation(kanji) {
+    // Find the entry in the readings array corresponding to the given kanji
+    let kanjiEntry = readings.find(entry => entry.literal === kanji);
+
+    if (kanjiEntry) {
+        let pronunciation = "";
+        // Extract ja_on pronunciations
+        if (kanjiEntry.ja_on && kanjiEntry.ja_on.length > 0) {
+            pronunciation += "<span class='readings-label'>On readings:</span><br>" + "◦ " + kanjiEntry.ja_on.map(pron => pron.replace(/,/g, "")).join("<br>◦ ");
+        }
+        // Extract ja_kun pronunciations
+        if (kanjiEntry.ja_kun && kanjiEntry.ja_kun.length > 0) {
+            pronunciation += (pronunciation.length > 0 ? "<br>" : "") + "<span class='readings-label'>Kun readings:</span><br>" + "‣ " + kanjiEntry.ja_kun.map(pron => pron.replace(/,/g, "")).join("<br>‣ ") + "<br>";
+        }
+        return pronunciation;
+    } else {
+        return "Pronunciation data not found for " + kanji;
+    }
+}
+
+
+
+
+
 
                 // Function to retrieve vocabulary from vocabulary.js
                 function getVocabulary(kanji) {
@@ -1231,115 +1240,114 @@
 
 
                 // Toggle visibility of keyword cells
-                $showReadings.click(function () {
+                showReadings.addEventListener('click', function () {
                     // Toggle the state
                     showReadingsState = !showReadingsState;
 
-
                     // Change button text based on the state
                     if (showReadingsState) {
-                        $(this).text("Hide readings");
+                        this.textContent = "Hide readings";
                     } else {
-                        $(this).text("Show readings");
+                        this.textContent = "Show readings";
                     }
 
-
                     // Iterate over each visible divTableCell element
-                    $(".divTableCell").each(function () {
+                    const divTableCells = document.querySelectorAll(".divTableCell");
+                    divTableCells.forEach(function (cell) {
                         // Extract the kanji text from the cell
-                        var kanjiText = $(this).find('.kanji').text().trim();
+                        var kanjiText = cell.querySelector('.kanji').textContent.trim();
 
                         // Check if pronunciation already exists
-                        var $pronunciationElement = $(this).find('.readings');
+                        var pronunciationElement = cell.querySelector('.readings');
 
-                        if ($pronunciationElement.length) {
+                        if (pronunciationElement) {
                             // If pronunciation exists, remove it to toggle
-                            $pronunciationElement.remove();
+                            pronunciationElement.remove();
                         } else {
                             // Retrieve the pronunciation for the kanji
                             var pronunciation = getPronunciation(kanjiText);
 
                             // Append the pronunciation to the cell
-                            $(this).append("<div class='readings'>" + pronunciation + "</div>");
+                            var newDiv = document.createElement("div");
+                            newDiv.className = 'readings';
+                            newDiv.innerHTML = pronunciation;
+                            cell.appendChild(newDiv);
                         }
                     });
-
                 });
 
+
                 // Toggle visibility of vocabulary cells
-                $showVocabulary.click(function () {
+                showVocabulary.addEventListener('click', function () {
                     // Toggle the state
                     showVocabularyState = !showVocabularyState;
 
-
                     // Change button text based on the state
                     if (showVocabularyState) {
-                        $(this).text("Hide vocabulary");
+                        this.textContent = "Hide vocabulary";
                     } else {
-                        $(this).text("Show vocabulary");
+                        this.textContent = "Show vocabulary";
                     }
 
-
                     // Iterate over each visible divTableCell element
-                    $(".divTableCell").each(function () {
+                    const divTableCells = document.querySelectorAll(".divTableCell");
+                    divTableCells.forEach(function (cell) {
                         // Extract the kanji text from the cell
-                        var kanjiText = $(this).find('.kanji').text().trim();
+                        var kanjiText = cell.querySelector('.kanji').textContent.trim();
 
-                        // Check if pronunciation already exists
-                        var $vocabElement = $(this).find('.vocabulary');
+                        // Check if vocabulary already exists
+                        var vocabElement = cell.querySelector('.vocabulary');
 
-                        if ($vocabElement.length) {
-                            // If pronunciation exists, remove it to toggle
-                            $vocabElement.remove();
+                        if (vocabElement) {
+                            // If vocabulary exists, remove it to toggle
+                            vocabElement.remove();
                         } else {
-                            // Retrieve the pronunciation for the kanji
+                            // Retrieve the vocabulary for the kanji
                             var vocab = getVocabulary(kanjiText);
 
-                            // Append the pronunciation to the cell
-                            $(this).append("<div class='vocabulary'>" + vocab + "</div>");
+                            // Append the vocabulary to the cell
+                            var newDiv = document.createElement("div");
+                            newDiv.className = 'vocabulary';
+                            newDiv.textContent = vocab;
+                            cell.appendChild(newDiv);
                         }
                     });
-
                 });
 
 
+
                 // Toggle visibility of stories cells
-                $showStory.click(function () {
+                showStory.addEventListener('click', function () {
                     // Toggle the state
                     showStoryState = !showStoryState;
 
-
                     // Change button text based on the state
-                    $(this).text(showStoryState ? "Hide stories" : "Show stories");
+                    this.textContent = showStoryState ? "Hide stories" : "Show stories";
 
                     // Iterate over each visible divTableCell element
-                    $(".divTableCell").each(function () {
-
+                    const divTableCells = document.querySelectorAll(".divTableCell");
+                    divTableCells.forEach(function (cell) {
                         // Modify the border and margin based on the state
                         if (showStoryState) {
-                            $(this).css({
-                                "border": "2px solid #2a2452",  // Example: sets a blue border with a thickness of 2px
-                                "margin": "5px",  // Example: sets a margin of 5px
-                            });
+                            cell.style.border = "2px solid #2a2452";  // Example: sets a blue border with a thickness of 2px
+                            cell.style.margin = "5px";  // Example: sets a margin of 5px
                         } else {
-                            $(this).css({
-                                "border": "",  // Remove border
-                                "margin": "",  // Remove margin
-                            });
+                            cell.style.border = "";  // Remove border
+                            cell.style.margin = "";  // Remove margin
                         }
 
                         // Extract the kanji text from the cell
-                        var kanjiText = $(this).find('.kanji').text().trim();
+                        var kanjiText = cell.querySelector('.kanji').textContent.trim();
 
                         // Check if story already exists
-                        var $storyElement = $(this).find('.story');
+                        var storyElement = cell.querySelector('.story');
 
-                        if ($storyElement.length && !showStoryState) {
+                        if (storyElement && !showStoryState) {
                             // If story exists and state is false (hide stories), remove it
-                            $storyElement.remove();
+                            storyElement.remove();
                         } else if (!showStoryState) {
                             // If state is false (hide stories), ensure border is removed
-                            $(this).css("border", "");
+                            cell.style.border = "";
                         } else {
                             // Retrieve the story for the kanji
                             var story = getStory(kanjiText);
@@ -1348,11 +1356,14 @@
                             story = story.replace(/\*(.*?)\*/g, "<i>$1</i>").replace(/#(.*?)#/g, "<b>$1</b>");
 
                             // Append the pronunciation to the cell
-                            $(this).append("<div class='story'>" + story + "</div>");
+                            var newDiv = document.createElement("div");
+                            newDiv.className = 'story';
+                            newDiv.innerHTML = story;
+                            cell.appendChild(newDiv);
                         }
                     });
-
                 });
+
 
 
                 // Get all elements with class "kanji"
@@ -1362,7 +1373,7 @@
                 function toggleFont(event) {
                     const element = event.target;
                     const currentFontFamily = window.getComputedStyle(element).getPropertyValue('font-family');
-                    const fontSizeMultiplier = $zoomSlider.val();
+                    const fontSizeMultiplier = document.querySelector("#zoomSlider").value;
                     let fontSize;
                     let fontFamily;
 
@@ -1385,16 +1396,18 @@
 
                 // Update progress bar
                 const progress = (Object.keys(Failures).length / KanjiTotal) * 100;
-                $(".progress_bar").css("width", progress.toFixed(2) + "%");
-                $(".progress_perc").text(progress.toFixed(2) + "%");
+                document.querySelector(".progress_bar").style.width = progress.toFixed(2) + "%";
+                document.querySelector(".progress_perc").textContent = progress.toFixed(2) + "%";
+
 
                 // Add an event listener to the "enableSelection" checkbox
-                $enableSelectionCheckbox.addEventListener("change", function () {
+                enableSelectionCheckbox.addEventListener("change", function () {
                     const userSelectValue = this.checked ? "text" : "none";
                     kanjiElements.forEach((element) => {
                         element.style.userSelect = userSelectValue;
                     });
                 });
+
 
 
                 // Extract keys and values from the Differences object
@@ -1513,8 +1526,8 @@
 
 
                 // Handle slider change event
-                $fileSlider.on("input", function () {
-                    const sliderValue = $(this).val();
+                fileSlider.addEventListener("input", function () {
+                    const sliderValue = this.value;
                     const datasetKeys = Object.keys(leitnerData);
 
                     const clampedValue = Math.min(Math.max(1, sliderValue), datasetKeys.length);
@@ -1529,13 +1542,13 @@
                     // Change the value of the div with id "nOfKanjiADay"
                     document.getElementById("nOfKanjiADay").textContent = "漢字: " + nOfKanjiADayValue;
 
-                    $(".divTableCell").each(function () {
-                        const id = this.id;
+                    document.querySelectorAll(".divTableCell").forEach(function (cell) {
+                        const id = cell.id;
                         if (leitnerData[selectedDataset] && leitnerData[selectedDataset].hasOwnProperty(id)) {
                             const value = leitnerData[selectedDataset][id];
-                            setBackgroundColor($(this), value);
+                            setBackgroundColor(cell, value);
                         } else {
-                            $(this).css("background-color", "white");
+                            cell.style.backgroundColor = "white";
                         }
                     });
 
@@ -1582,41 +1595,50 @@
                 updateDateDisplay(initialDataset);
 
                 // Handle zoom slider change event
-                $zoomSlider.on("input", function () {
-                    const fontSizeMultiplier = $(this).val();
+                zoomSlider.addEventListener("input", function () {
+                    const fontSizeMultiplier = this.value;
                     const kanjiFontSize = fontSizeMultiplier === "1" ? "3em" : "0.80em";
                     const framenrFontSize = fontSizeMultiplier === "1" ? "0.8em" : "0em";
 
+                    const divTableCells = document.querySelectorAll(".divTableCell");
+                    const kanjiElements = document.querySelectorAll(".kanji");
+                    const framenrElements = document.querySelectorAll(".framenr");
+
                     if (fontSizeMultiplier === "0") {
-                        $(".divTableCell").css({
-                            'border': 'black solid 1px',
-                            'padding-left': '5px',
-                            'padding-right': '5px'
+                        divTableCells.forEach((cell) => {
+                            cell.style.border = 'black solid 1px';
+                            cell.style.paddingLeft = '5px';
+                            cell.style.paddingRight = '5px';
                         });
-                        $(".kanji").css({
-                            'font-size': kanjiFontSize,
-                            'line-height': '1.2em',
+                        kanjiElements.forEach((kanji) => {
+                            kanji.style.fontSize = kanjiFontSize;
+                            kanji.style.lineHeight = '1.2em';
                         });
                     } else {
-                        $(".divTableCell").css({
-                            'border': 'black solid 1px',
-                            'padding-left': '1px',
-                            'padding-right': '1px'
+                        divTableCells.forEach((cell) => {
+                            cell.style.border = 'black solid 1px';
+                            cell.style.paddingLeft = '1px';
+                            cell.style.paddingRight = '1px';
                         });
                     }
 
-                    $(".kanji").css("font-size", kanjiFontSize);
-                    $(".framenr").css("font-size", framenrFontSize);
+                    kanjiElements.forEach((kanji) => {
+                        kanji.style.fontSize = kanjiFontSize;
+                    });
+                    framenrElements.forEach((framenr) => {
+                        framenr.style.fontSize = framenrFontSize;
+                    });
                 });
+
 
                 // Handle settings and close settings button click events
-                $settings.on('click', function () {
-                    $('#settings-popup').show();
+                settings.addEventListener('click', function () {
+                    document.querySelector('#settings-popup').style.display = 'block';
                 });
 
-                $closeSettingsBtn.on('click', function () {
-                    $('#settings-popup').hide();
-                    $forgottenCheckbox.checked = false;
+                closeSettingsBtn.addEventListener('click', function () {
+                    document.querySelector('#settings-popup').style.display = 'none';
+                    forgottenCheckbox.checked = false;
                 });
 
 
@@ -1630,24 +1652,29 @@
                 };
 
                 const options = { customKanaMapping: { '.': '.', '-': '-' } };
-                $searchInput.focus()
-                $searchInput.on("input", function () {
-                    var searchValue = $(this).val().toLowerCase();
+                document.querySelector("#mySearch").focus();
+                document.querySelector("#mySearch").addEventListener("input", function () {
+                    var searchValue = this.value.toLowerCase();
                     var searchWords = searchValue.split(/\s+/).filter(Boolean); // Split the input into individual words
 
                     // Check if the user entered "-failed" in the search
                     if (searchWords.includes("-failed")) {
                         // Toggle visibility based on Failures object
-                        $(".divTableCell").each(function () {
-                            var framenr = $(this).find('.framenr').text();
+                        document.querySelectorAll(".divTableCell").forEach(function (cell) {
+                            var framenr = cell.querySelector('.framenr').textContent;
                             var failuresValue = Failures[framenr] || 0;
-                            $(this).toggle(failuresValue > 0);
+                            cell.style.display = failuresValue > 0 ? 'block' : 'none';
                             // Check if the failure-value class is already present
-                            if (!$(this).hasClass('failure-value')) {
+                            if (!cell.classList.contains('failure-value')) {
                                 // Add the class and append the value
-                                $(this).addClass('failure-value').append("<div class='failure-value'>" + failuresValue + "</div>");
+                                cell.classList.add('failure-value');
+                                var newDiv = document.createElement("div");
+                                newDiv.className = 'failure-value';
+                                newDiv.textContent = failuresValue;
+                                cell.appendChild(newDiv);
                             }
                         });
+
                     }
                     // Modify the code to dynamically select the kanji list based on user input
                     else if (searchWords.includes("n5") || searchWords.includes("n4") || searchWords.includes("n3") || searchWords.includes("n2") || searchWords.includes("n1")) {
@@ -1657,17 +1684,18 @@
                         if (level && kanjiLists[level]) {
                             var filteredCount = 0; // Initialize a counter for filtered kanji
 
-                            $(".divTableCell").each(function () {
-                                var kanjiText = $(this).find('.kanji').text().trim();
+                            document.querySelectorAll(".divTableCell").forEach(function (cell) {
+                                var kanjiText = cell.querySelector('.kanji').textContent.trim();
                                 var kanjiArray = kanjiLists[level];
 
                                 var found = kanjiArray.includes(kanjiText);
-                                $(this).toggle(found);
+                                cell.style.display = found ? 'block' : 'none';
 
                                 if (found) {
                                     filteredCount++; // Increment the counter for each filtered kanji
                                 }
                             });
+
 
                             // Display the count of filtered kanji
                             console.log("Number of Kanji Filtered: " + filteredCount);
@@ -1694,13 +1722,14 @@
                         });
 
                         // Toggle visibility of elements based on found readings
-                        $(".divTableCell").each(function () {
-                            var kanjiText = $(this).find('.kanji').text().trim();
+                        document.querySelectorAll(".divTableCell").forEach(function (cell) {
+                            var kanjiText = cell.querySelector('.kanji').textContent.trim();
                             var found = foundReadings.some(function (reading) {
                                 return reading.literal === kanjiText;
                             });
-                            $(this).toggle(found);
+                            cell.style.display = found ? 'block' : 'none';
                         });
+
                     }
                     else if (searchValue.startsWith("kun:")) {
                         var kunSearch = searchValue.substring(4).trim();
@@ -1801,7 +1830,7 @@
                 // Handle arrow key functionality
                 document.addEventListener("keydown", function (event) {
                     if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-                        const currentSliderValue = parseInt($fileSlider.val());
+                        const currentSliderValue = parseInt(document.querySelector("#fileSlider").value);
                         const step = 1;
                         let newSliderValue;
 
@@ -1811,15 +1840,17 @@
                             newSliderValue = currentSliderValue + step;
                         }
                         // Ensure the newSliderValue is within a valid range (assuming 1 to max)
-                        newSliderValue = Math.min(Math.max(1, newSliderValue), $fileSlider.attr("max"));
+                        const fileSlider = document.querySelector("#fileSlider");
+                        newSliderValue = Math.min(Math.max(1, newSliderValue), fileSlider.getAttribute("max"));
                         // Update the slider value
-                        $fileSlider.val(newSliderValue).trigger("input");
+                        fileSlider.value = newSliderValue;
+                        // Trigger the input event
+                        fileSlider.dispatchEvent(new Event('input'));
                     }
                 });
 
 
-                // Get the slider element
-                const fileSlider = document.getElementById('fileSlider');
+
                 const leftBar = document.querySelector('.left-bar');
                 const rightBar = document.querySelector('.right-bar');
 
@@ -1862,24 +1893,31 @@
 
 
                 // Add a click event listener to the delete button
-                $deleteButton.on("click", function () {
+                document.querySelector("#deleteSearch").addEventListener("click", function () {
 
                     // Check if the input is not empty
-                    if ($searchInput.val() !== "") {
+                    var searchInput = document.querySelector("#mySearch");
+                    if (searchInput.value !== "") {
                         // Clear the input field
-                        $searchInput.val("");
+                        searchInput.value = "";
 
                         // Focus on the input field
-                        $searchInput.focus();
+                        searchInput.focus();
                     }
 
-                    $(".divTableCell .failure-value").remove();
+                    // Remove all .failure-value elements within .divTableCell elements
+                    var failureValues = document.querySelectorAll(".divTableCell .failure-value");
+                    failureValues.forEach(function (failureValue) {
+                        failureValue.remove();
+                    });
+
                     // Show all .divTableCell elements
-                    const divTableCells = document.querySelectorAll(".divTableCell");
-                    for (const cell of divTableCells) {
+                    var divTableCells = document.querySelectorAll(".divTableCell");
+                    divTableCells.forEach(function (cell) {
                         cell.style.display = "block"; // Or whatever the initial display value should be
-                    }
+                    });
                 });
+
 
 
                 const lastDay = labels[labels.length - 1];
@@ -2019,12 +2057,14 @@
 
                     // Get a reference to the button
                     var button = document.getElementById("lastBtn");
-
+                    var fileSlider = document.querySelector("#fileSlider");
                     if (button.textContent === "last") {
                         const index = kanjiStudiedTillNow + 1;
                         const elementToFocus = document.getElementById(index);
                         let end = document.getElementById('fileSlider').max;
-                        $fileSlider.val(end).trigger("input");
+                        // Set the value of the slider to 'end' and trigger the input event
+                        fileSlider.value = end;
+                        fileSlider.dispatchEvent(new Event('input'));
 
                         // Focus on the element
                         elementToFocus.focus();
@@ -2037,7 +2077,9 @@
                     } else {
 
                         const elementToFocus = document.body;
-                        $fileSlider.val(0).trigger("input");
+                        // Set the value of the slider to 0 and trigger the input event
+                        fileSlider.value = 0;
+                        fileSlider.dispatchEvent(new Event('input'));
 
                         // Focus on the element
                         elementToFocus.focus();
