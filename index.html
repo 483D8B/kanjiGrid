@@ -1732,18 +1732,19 @@
 
                 // Handle arrow key functionality
                 document.addEventListener("keydown", function (event) {
-                    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-                        const currentSliderValue = parseInt(document.querySelector("#fileSlider").value);
-                        const step = 1;
-                        let newSliderValue;
+                    let newSliderValue;
+                    const currentSliderValue = parseInt(fileSlider.value);
+                    const step = 1;
 
-                        if (event.key === "ArrowLeft") {
-                            newSliderValue = currentSliderValue - step;
-                        } else if (event.key === "ArrowRight") {
-                            newSliderValue = currentSliderValue + step;
-                        }
+                    if (event.key === "ArrowLeft") {
+                        newSliderValue = currentSliderValue - step;
+                    } else if (event.key === "ArrowRight") {
+                        newSliderValue = currentSliderValue + step;
+                    }
+
+                    // If newSliderValue is defined, update the slider
+                    if (newSliderValue !== undefined) {
                         // Ensure the newSliderValue is within a valid range (assuming 1 to max)
-                        const fileSlider = document.querySelector("#fileSlider");
                         newSliderValue = Math.min(Math.max(1, newSliderValue), fileSlider.getAttribute("max"));
                         // Update the slider value
                         fileSlider.value = newSliderValue;
@@ -1751,6 +1752,7 @@
                         fileSlider.dispatchEvent(new Event('input'));
                     }
                 });
+
 
 
 
@@ -2020,6 +2022,28 @@
                         });
                     }
                 }
+
+                // Get the button elements once and store them in an object
+                var buttons = {
+                    'k': document.getElementById('showKeyword'),
+                    'r': document.getElementById('showReadings'),
+                    's': document.getElementById('showStory'),
+                    'v': document.getElementById('showVocabulary')
+                };
+
+                document.addEventListener('keydown', function (event) {
+                    // Check if the active element is not an input field
+                    if (document.activeElement.tagName.toLowerCase() !== 'input') {
+                        // Check if the pressed key corresponds to a button
+                        if (buttons.hasOwnProperty(event.key)) {
+                            // Click the corresponding button
+                            buttons[event.key].click();
+                        }
+                    }
+                });
+
+
+
 
 
             });  //end doc ready
