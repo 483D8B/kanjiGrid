@@ -1240,21 +1240,21 @@
 
                 // Get all elements with class "kanji"
                 const kanjiElements = document.querySelectorAll('.kanji');
-
+                let defaultFont = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif';
+                let fontStrokeOrder = 'KanjiStrokeOrders';
                 // Handle double-click event for toggling font
                 function toggleFont(event) {
                     const element = event.target;
                     const currentFontFamily = window.getComputedStyle(element).getPropertyValue('font-family');
                     const fontSizeMultiplier = document.querySelector("#zoomSlider").value;
                     let fontSize;
-                    let fontFamily;
-
+                    let fontFamily;   
                     if (fontSizeMultiplier === "1") {
-                        fontSize = currentFontFamily !== 'KanjiStrokeOrders' ? '12em' : '3em';
-                        fontFamily = currentFontFamily !== 'KanjiStrokeOrders' ? 'KanjiStrokeOrders' : '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif';
+                        fontSize = currentFontFamily !== fontStrokeOrder ? '12em' : '3em';
+                        fontFamily = currentFontFamily !== fontStrokeOrder ? fontStrokeOrder : defaultFont;
                     } else if (fontSizeMultiplier === "0") {
-                        fontSize = currentFontFamily !== 'KanjiStrokeOrders' ? '12em' : '0.8em';
-                        fontFamily = currentFontFamily !== 'KanjiStrokeOrders' ? 'KanjiStrokeOrders' : '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif';
+                        fontSize = currentFontFamily !== fontStrokeOrder ? '12em' : '0.8em';
+                        fontFamily = currentFontFamily !== fontStrokeOrder ? fontStrokeOrder : defaultFont;
                     }
 
                     element.style.fontSize = fontSize;
@@ -1492,6 +1492,12 @@
                             cell.style.border = 'black solid 1px';
                             cell.style.paddingLeft = '1px';
                             cell.style.paddingRight = '1px';
+                        });
+                        kanjiElements.forEach((kanji) => {
+                            kanji.style.fontSize = kanjiFontSize;
+                            kanji.style.lineHeight = '1em';
+                            // Reset the font to the default
+                            kanji.style.fontFamily = kanji.dataset.originalFontFamily || defaultFont;
                         });
                     }
 
