@@ -875,6 +875,22 @@
             color: white;
         }
 
+        #quizBtn {
+            position: absolute;
+            top: 0;
+            right: calc(0.2em + 5px + 2px + 2px + 50px);
+            /* margin-left of lastBtn + border of lastBtn + padding of lastBtn + width of lastBtn (assuming it's 5px) */
+            margin-top: 0.2em;
+            text-align: center;
+            background-color: #764C4C;
+            border: 2px solid black;
+            padding: 2px;
+            font-family: Verdana, sans-serif;
+            color: white;
+        }
+
+
+
         .small-li {
             font-size: 0.7em;
         }
@@ -890,6 +906,111 @@
             width: 1px;
             height: 1px;
             overflow: hidden;
+        }
+
+        .quiz-popup {
+            position: fixed;
+            width: 80vw;
+            height: 85vh;
+            top: 50%;
+            left: 50%;
+            padding: 2%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            border: 2px solid black;
+            display: none;
+            opacity: 0.98;
+            font-family: Verdana, sans-serif;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            overflow-y: auto;
+            z-index: 90;
+        }
+
+        #failure-count-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 9em;
+        }
+
+        #failure-count-form label {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #failure-count-form input {
+            width: 50%;
+            padding: 10px;
+            border: 2px solid #764C4C;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        #start-quiz-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #764C4C;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        #start-quiz-btn:hover {
+            background-color: #563636;
+        }
+
+        #close-quiz-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2em;
+            cursor: pointer;
+            font-weight: 900;
+            background-color: transparent;
+            border: none;
+        }
+
+        #quizTitle {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        #user-answer {
+            width: 75%;
+            margin: auto;
+            display: block;
+            /* Make the input a block-level element */
+            font-family: Arial, sans-serif;
+            font-size: 1em;
+            padding: 10px;
+            border: 2px solid #ccc;
+            background-color: #fff;
+            color: #333;
+            border-radius: 4px;
+            margin-top: 1em;
+        }
+
+        #question-display {
+            display: inline-block;
+            position: relative;
+            /* Changed from absolute to relative */
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+            background-color: white;
+            padding: 10px;
+            font-size: 6em;
+            border: 5px solid black;
+            text-align: center;
+            line-height: 1em;
         }
     </style>
 </head>
@@ -1000,6 +1121,25 @@
     </div>
 
     <button id="lastBtn">last</button>
+    <button id="quizBtn">quiz</button>
+
+    <div id="quiz-popup" class="quiz-popup" style="display: none;">
+        <!-- Add your quiz options here -->
+        <form id="failure-count-form">
+            <label for="failure-count">Failure count:</label>
+            <input type="number" id="failure-count" name="failure-count" min="0">
+            <button id="start-quiz-btn">Start Quiz</button>
+        </form>
+        <button id="close-quiz-btn">x</button>
+
+        <div class="quiz-item">
+            <div id="quizTitle">?</div>
+            <div id="question-display">&nbsp;&nbsp;&nbsp;</div>
+            <input type="text" id="user-answer" placeholder="Enter your answer">
+            <p id="result"></p>
+        </div>
+    </div>
+
 
 
     </p>
@@ -2047,14 +2187,86 @@
                     }
                 });
 
+                // Cache DOM elements
+                let failureCountInput = document.getElementById('failure-count');
+                let questionDisplay = document.getElementById('question-display');
+                let userAnswer = document.getElementById('user-answer');
+                let startQuizBtn = document.getElementById('start-quiz-btn');
 
-            console.log(getKanjisWithFailureCount(Failures, 10)); 
-            console.log(getIdsWithFailureCount(Failures, 10)); 
-                
+                // Define the input event handler
+                let inputHandler;
+
+                // Add a click event listener to the start quiz button
+                startQuizBtn.addEventListener('click', function (event) {
+                    // Prevent the form from being submitted
+                    event.preventDefault();
+
+                    // Remove the previous event listener, if it exists
+                    if (inputHandler) {
+                        userAnswer.removeEventListener('input', inputHandler);
+                    }
+
+                    // Get the failure count input
+                    let failureCount = parseInt(failureCountInput.value);
+
+                    // Call the function to get the kanjis
+                    let kanjis = getKanjisWithFailureCount(Failures, failureCount);
+
+                    // Generate a random order for the kanjis
+                    let kanjiOrder = [...Array(kanjis.length).keys()].sort(() => Math.random() - 0.5);
+
+                    // Initialize the current kanji index
+                    let currentKanjiIndex = 0;
+
+                    // Function to display the next kanji
+                    function displayNextKanji() {
+                        // Get the next kanji in the random order
+                        let randomKanji = kanjis[kanjiOrder[currentKanjiIndex]];
+
+                        // Display the random kanji in the question-display div
+                        questionDisplay.textContent = randomKanji;
+
+                        // Increment the current kanji index
+                        currentKanjiIndex++;
+                    }
+
+                    // Display the first kanji
+                    displayNextKanji();
+
+                    // Define the input event handler
+                    inputHandler = function () {
+                        // Assuming you have a function getKeywordForKanji that returns the keyword for a given kanji
+                        let keyword = getKeywordForKanji(questionDisplay.textContent);
+
+                        if (userAnswer.value === keyword) {
+                            // If the user's answer is correct, change the border of the input
+                            userAnswer.style.border = '2px solid green';
+
+                            // Clear the input for the next question
+                            userAnswer.value = '';
+
+                            // Display the next kanji
+                            displayNextKanji();
+                        } else {
+                            // If the user's answer is incorrect, change the border of the input
+                            userAnswer.style.border = '2px solid red';
+                        }
+                    };
+
+                    // Add the event listener to the user-answer input
+                    userAnswer.addEventListener('input', inputHandler);
+                });
+
 
             });  //end doc ready
 
+            document.getElementById('quizBtn').addEventListener('click', function () {
+                document.getElementById('quiz-popup').style.display = 'block';
+            });
 
+            document.getElementById('close-quiz-btn').addEventListener('click', function () {
+                document.getElementById('quiz-popup').style.display = 'none';
+            });
 
 
             const dateElement = document.querySelector("#datasetDate");
@@ -2220,6 +2432,20 @@
                 return kanjis;
             }
 
+            function getKeywordForKanji(kanji) {
+                // Find the object in the data array where the kanji property matches the given kanji
+                var kanjiObject = data.find(function (obj) {
+                    return obj.kanji === kanji;
+                });
+
+                // If a matching object was found, return the keyword property of that object
+                if (kanjiObject) {
+                    return kanjiObject.keyword;
+                }
+
+                // If no matching object was found, return null
+                return null;
+            }
 
 
 
