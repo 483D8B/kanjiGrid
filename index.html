@@ -1248,7 +1248,7 @@
                     const currentFontFamily = window.getComputedStyle(element).getPropertyValue('font-family');
                     const fontSizeMultiplier = document.querySelector("#zoomSlider").value;
                     let fontSize;
-                    let fontFamily;   
+                    let fontFamily;
                     if (fontSizeMultiplier === "1") {
                         fontSize = currentFontFamily !== fontStrokeOrder ? '12em' : '3em';
                         fontFamily = currentFontFamily !== fontStrokeOrder ? fontStrokeOrder : defaultFont;
@@ -1400,20 +1400,20 @@
                 const divTableCellElements = document.querySelectorAll(".divTableCell");
 
                 const addAnnotation = (chart, type, mode, scaleID, value, borderColor, borderWidth, labelContent) => {
-                        chart.options.plugins.annotation.annotations.push({
-                            type: type,
-                            mode: mode,
-                            scaleID: scaleID,
-                            value: value,
-                            borderColor: borderColor,
-                            borderWidth: borderWidth,
-                            label: {
-                                content: labelContent,
-                                enabled: true,
-                                position: 'center',
-                            }
-                        });
-                    };
+                    chart.options.plugins.annotation.annotations.push({
+                        type: type,
+                        mode: mode,
+                        scaleID: scaleID,
+                        value: value,
+                        borderColor: borderColor,
+                        borderWidth: borderWidth,
+                        label: {
+                            content: labelContent,
+                            enabled: true,
+                            position: 'center',
+                        }
+                    });
+                };
 
 
 
@@ -1467,15 +1467,13 @@
                 let initialDataset = datasetKeys[0];
                 updateDateDisplay(initialDataset);
 
+                const divTableCells = document.querySelectorAll(".divTableCell");
+                const framenrElements = document.querySelectorAll(".framenr");
                 // Handle zoom slider change event
                 zoomSlider.addEventListener("input", function () {
                     const fontSizeMultiplier = this.value;
                     const kanjiFontSize = fontSizeMultiplier === "1" ? "3em" : "0.80em";
                     const framenrFontSize = fontSizeMultiplier === "1" ? "0.8em" : "0em";
-
-                    const divTableCells = document.querySelectorAll(".divTableCell");
-                    const kanjiElements = document.querySelectorAll(".kanji");
-                    const framenrElements = document.querySelectorAll(".framenr");
 
                     if (fontSizeMultiplier === "0") {
                         divTableCells.forEach((cell) => {
@@ -2050,10 +2048,13 @@
                 });
 
 
-
-
+            console.log(getKanjisWithFailureCount(Failures, 10)); 
+            console.log(getIdsWithFailureCount(Failures, 10)); 
+                
 
             });  //end doc ready
+
+
 
 
             const dateElement = document.querySelector("#datasetDate");
@@ -2192,6 +2193,36 @@
                     return "Story data not found for " + kanji;
                 }
             }
+
+            let idToKanji = {};
+            data.forEach(item => {
+                idToKanji[item.id] = item.kanji;
+            });
+
+
+            function getIdsWithFailureCount(failures, count) {
+                let ids = [];
+                for (let id in failures) {
+                    if (failures[id] >= count) {
+                        ids.push(parseInt(id));
+                    }
+                }
+                return ids;
+            }
+
+            function getKanjisWithFailureCount(failures, count) {
+                let kanjis = [];
+                for (let id in failures) {
+                    if (failures[id] >= count) {
+                        kanjis.push(idToKanji[id]);
+                    }
+                }
+                return kanjis;
+            }
+
+
+
+
 
 
         </script>
