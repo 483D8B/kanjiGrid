@@ -1396,36 +1396,10 @@
                 });
 
 
+                const nOfKanjiADayElement = document.getElementById("nOfKanjiADay");
+                const divTableCellElements = document.querySelectorAll(".divTableCell");
 
-                // Handle slider change event
-                fileSlider.addEventListener("input", function () {
-                    const sliderValue = this.value;
-                    const datasetKeys = Object.keys(leitnerData);
-
-                    const clampedValue = Math.min(Math.max(1, sliderValue), datasetKeys.length);
-                    const datasetIndex = clampedValue - 1;
-                    const selectedDataset = datasetKeys[datasetIndex];
-
-                    updateDateDisplay(selectedDataset);
-
-                    // Assuming Differences is the object containing the value
-                    const nOfKanjiADayValue = Differences[sliderValue - 1] || 0;
-
-                    // Change the value of the div with id "nOfKanjiADay"
-                    document.getElementById("nOfKanjiADay").textContent = "漢字: " + nOfKanjiADayValue;
-
-                    document.querySelectorAll(".divTableCell").forEach(function (cell) {
-                        const id = cell.id;
-                        if (leitnerData[selectedDataset] && leitnerData[selectedDataset].hasOwnProperty(id)) {
-                            const value = leitnerData[selectedDataset][id];
-                            setBackgroundColor(cell, value);
-                        } else {
-                            cell.style.backgroundColor = "white";
-                        }
-                    });
-
-
-                    const addAnnotation = (chart, type, mode, scaleID, value, borderColor, borderWidth, labelContent) => {
+                const addAnnotation = (chart, type, mode, scaleID, value, borderColor, borderWidth, labelContent) => {
                         chart.options.plugins.annotation.annotations.push({
                             type: type,
                             mode: mode,
@@ -1441,11 +1415,38 @@
                         });
                     };
 
+
+
+                // Handle slider change event
+                fileSlider.addEventListener("input", function () {
+                    const sliderValue = this.value;
+
+                    const clampedValue = Math.min(Math.max(1, sliderValue), datasetKeys.length);
+                    const datasetIndex = clampedValue - 1;
+                    const selectedDataset = datasetKeys[datasetIndex];
+
+                    updateDateDisplay(selectedDataset);
+
+                    // Assuming Differences is the object containing the value
+                    const nOfKanjiADayValue = Differences[sliderValue - 1] || 0;
+
+                    // Change the value of the div with id "nOfKanjiADay"
+                    nOfKanjiADayElement.textContent = "漢字: " + nOfKanjiADayValue;
+
+                    divTableCellElements.forEach(function (cell) {
+                        const id = cell.id;
+                        if (leitnerData[selectedDataset] && leitnerData[selectedDataset].hasOwnProperty(id)) {
+                            const value = leitnerData[selectedDataset][id];
+                            setBackgroundColor(cell, value);
+                        } else {
+                            cell.style.backgroundColor = "white";
+                        }
+                    });
+
+
                     // Remove existing vertical line annotations
                     myChart.options.plugins.annotation.annotations = [];
                     retentionChart.options.plugins.annotation.annotations = [];
-
-
 
                     // Add a new horizontal line annotation at the selected day
                     addAnnotation(myChart, 'line', 'horizontal', 'y', calculateMedian(values), '#A06D7F', 1, sliderValue);
@@ -1462,7 +1463,7 @@
 
                 // Initialize the date display and initial cell colors
                 let initialSliderValue = 1;
-                const datasetKeys = Object.keys(leitnerData).filter(key => key !== "koohii_2023-09-12"); // Exclude the key "koohii_2023-09-12";
+                const datasetKeys = Object.keys(leitnerData);
                 let initialDataset = datasetKeys[0];
                 updateDateDisplay(initialDataset);
 
@@ -2049,9 +2050,13 @@
             });  //end doc ready
 
 
+            const dateElement = document.querySelector("#datasetDate");
+            const selectedDayLabelElement = document.querySelector("#selectedDayLabel");
+            const nOfKanjiADayElement = document.querySelector("#nOfKanjiADay");
+
             // Define the updateDateDisplay function globally
             function updateDateDisplay(selectedDataset) {
-                const dateElement = document.querySelector("#datasetDate");
+
                 const datasetDates = Object.keys(leitnerData).map(dataset => ({
                     name: dataset,
                     date: dataset.replace("koohii_", "")
@@ -2062,12 +2067,12 @@
 
                 if (selectedDateObj.date == "origin") {
                     dateText = "Slide to see progress";
-                    document.querySelector("#selectedDayLabel").textContent = "";
-                    document.querySelector("#nOfKanjiADay").textContent = "";
+                    selectedDayLabelElement.textContent = `${dateText}`;
+                    nOfKanjiADayElement.textContent = "";
                 }
                 else {
                     dateText = selectedDateObj ? `${formatDateToDateString(new Date(selectedDateObj.date))}` : "No data ( •_•)";
-                    document.querySelector("#selectedDayLabel").textContent = `${dateText}`;
+                    selectedDayLabelElement.textContent = `${dateText}`;
                 }
 
                 dateElement.textContent = dateText;
