@@ -996,6 +996,11 @@
             color: #333;
             border-radius: 4px;
             margin-top: 1em;
+            text-align: center;
+        }
+
+        #user-answer::placeholder {
+            text-align: center;
         }
 
         #question-display {
@@ -1011,6 +1016,14 @@
             border: 5px solid black;
             text-align: center;
             line-height: 1em;
+        }
+
+        #end-quiz-gif {
+            display: inline-block;
+            position: relative;
+            left: 50%;
+            margin-top: 0.5em;
+            transform: translateX(-50%);
         }
     </style>
 </head>
@@ -1135,8 +1148,8 @@
         <div class="quiz-item">
             <div id="quizTitle">?</div>
             <div id="question-display">&nbsp;&nbsp;&nbsp;</div>
-            <input type="text" id="user-answer" placeholder="Enter your answer">
-            <p id="result"></p>
+            <input type="text" id="user-answer" placeholder="Enter the keyword">
+            <img id="end-quiz-gif" style="display: none;">
         </div>
     </div>
 
@@ -1441,6 +1454,7 @@
                         }]
                     },
                     options: {
+                        animation: false,
                         scales: {
                             y: {
                                 beginAtZero: true,
@@ -1458,6 +1472,14 @@
 
                 const dates = Object.keys(Retention);
                 const retentionValues = Object.values(Retention);
+
+                // Assuming dates is an array of Date objects
+                let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+                let months = dates.map(dateString => {
+                    let date = new Date(dateString);
+                    return monthNames[date.getMonth()];
+                });
 
                 // Calculate the average value
                 const averageRetention = retentionValues.reduce((total, value) => total + value, 0) / retentionValues.length;
@@ -1495,14 +1517,25 @@
                         }]
                     },
                     options: {
+                        animation: false,
+                        responsive: true, // this makes the chart responsive
+                        maintainAspectRatio: false, // allows you to control the aspect ratio
                         elements: {
                             point: {
                                 borderWidth: 0, //not working
                                 pointBorderColor: 'transparent',
-                                radius: 2,
+                                radius: 1,
+                                hoverRadius:5,
                             }
                         },
                         scales: {
+                            x: {
+                                ticks: {
+                                    callback: function (value, index, values) {
+                                        return months[index];
+                                    }
+                                }
+                            },
                             y: {
                                 beginAtZero: true,
                                 type: 'linear',
@@ -1519,17 +1552,25 @@
                                 drawTime: 'afterDatasetsDraw',
                                 annotations: [{
                                     type: 'line',
-                                    mode: 'horizontal',
-                                    scaleID: 'y',
-                                    value: averageRetention,
+                                    mode: 'vertical', // Change this to 'vertical'
+                                    scaleID: 'x', // Change this to 'x'
+                                    value: dates[0], // Set this to the first label on the x-axis
                                     borderColor: 'blue', // Adjust the color as needed
                                     borderWidth: 1,
                                     label: {
                                         content: 'Average retention',
                                         enabled: true,
-                                        position: 'right'
+                                        position: 'top' // Change this to 'top' to position the label at the top of the line
                                     }
                                 }]
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function (tooltipItem) {
+                                        // Display the full date in the tooltip
+                                        return dates[tooltipItem[0].index];
+                                    }
+                                }
                             }
                         }
                     }
@@ -2188,18 +2229,22 @@
                 });
 
                 // Cache DOM elements
-                let failureCountInput = document.getElementById('failure-count');
-                let questionDisplay = document.getElementById('question-display');
-                let userAnswer = document.getElementById('user-answer');
-                let startQuizBtn = document.getElementById('start-quiz-btn');
+                const failureCountInput = document.getElementById('failure-count');
+                const questionDisplay = document.getElementById('question-display');
+                const userAnswer = document.getElementById('user-answer');
+                const startQuizBtn = document.getElementById('start-quiz-btn');
+                const gifElement = document.getElementById('end-quiz-gif');
 
                 // Define the input event handler
                 let inputHandler;
 
-                // Add a click event listener to the start quiz button
-                startQuizBtn.addEventListener('click', function (event) {
+                // Define the click event handler
+                function clickHandler(event) {
                     // Prevent the form from being submitted
                     event.preventDefault();
+
+                    // Hide the gif
+                    gifElement.style.display = 'none';
 
                     // Remove the previous event listener, if it exists
                     if (inputHandler) {
@@ -2220,6 +2265,20 @@
 
                     // Function to display the next kanji
                     function displayNextKanji() {
+                        // Change the text of the start quiz button to "Restart Quiz"
+                        startQuizBtn.textContent = "Restart Quiz";
+
+                        // Check if there are no more kanji to display
+                        if (currentKanjiIndex >= kanjiOrder.length) {
+                            // Display a checkmark in the question-display div
+                            questionDisplay.textContent = "✔️";
+                            // Display the gif at the bottom
+                            gifElement.src = "https://c.tenor.com/_AuP0doVdfEAAAAC/tenor.gif";
+                            gifElement.style.display = "block";
+                            // Return from the function
+                            return;
+                        }
+
                         // Get the next kanji in the random order
                         let randomKanji = kanjis[kanjiOrder[currentKanjiIndex]];
 
@@ -2236,7 +2295,8 @@
                     // Define the input event handler
                     inputHandler = function () {
                         // Assuming you have a function getKeywordForKanji that returns the keyword for a given kanji
-                        let keyword = getKeywordForKanji(questionDisplay.textContent);
+                        const questionText = questionDisplay.textContent;
+                        let keyword = getKeywordForKanji(questionText);
 
                         if (userAnswer.value === keyword) {
                             // If the user's answer is correct, change the border of the input
@@ -2255,7 +2315,11 @@
 
                     // Add the event listener to the user-answer input
                     userAnswer.addEventListener('input', inputHandler);
-                });
+                }
+
+                // Add a click event listener to the start quiz button
+                startQuizBtn.addEventListener('click', clickHandler);
+
 
 
             });  //end doc ready
