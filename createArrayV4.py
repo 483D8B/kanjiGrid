@@ -1,5 +1,6 @@
 import os
 import csv
+from jsmin import jsmin
 
 # Get the directory of the script
 script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -146,3 +147,20 @@ with open(output_file, 'w', encoding='utf-8') as js_file:
     js_file.write('};\n')
 
 print(f'Saved data as JavaScript objects in {output_file}')
+
+# After writing to the js_file, close it
+js_file.close()
+
+# Open the file again in read mode
+with open(output_file, 'r', encoding='utf-8') as js_file:
+    js = js_file.read()
+
+# Minify the JavaScript code
+minified_js = jsmin(js)
+
+# Write the minified code to a new file
+minified_output_file = output_file.replace('.js', '.min.js')
+with open(minified_output_file, 'w', encoding='utf-8') as js_file:
+    js_file.write(minified_js)
+
+print(f'Saved minified data as JavaScript objects in {minified_output_file}')
