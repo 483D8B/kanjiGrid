@@ -867,26 +867,24 @@
             margin-top: 0.2em;
             margin-left: 0.2em;
             text-align: center;
-            background-color: #764C4C;
+            background-color: transparent;
             border: 2px solid black;
             margin-right: 5px;
             padding: 2px;
             font-family: Verdana, sans-serif;
-            color: white;
+            color: black;
         }
 
         #quizBtn {
-            position: absolute;
-            top: 0;
-            right: calc(0.2em + 5px + 2px + 2px + 50px);
-            /* margin-left of lastBtn + border of lastBtn + padding of lastBtn + width of lastBtn (assuming it's 5px) */
-            margin-top: 0.2em;
-            text-align: center;
-            background-color: #764C4C;
+            background-color: #cde6f5;
+            border-radius: 15px;
             border: 2px solid black;
-            padding: 2px;
+            margin-right: 5px;
+            float: right;
+            padding: 5px;
             font-family: Verdana, sans-serif;
-            color: white;
+            color: black;
+            font-size: 1em;
         }
 
 
@@ -911,7 +909,7 @@
         .quiz-popup {
             position: fixed;
             width: 80vw;
-            height: 85vh;
+            height: 70vh;
             top: 50%;
             left: 50%;
             padding: 2%;
@@ -977,12 +975,6 @@
             border: none;
         }
 
-        #quizTitle {
-            text-align: center;
-            font-size: 2em;
-            font-weight: 600;
-        }
-
         #user-answer {
             width: 75%;
             margin: auto;
@@ -1016,6 +1008,7 @@
             border: 5px solid black;
             text-align: center;
             line-height: 1em;
+            margin-top: 0.1em;
         }
 
         #end-quiz-gif {
@@ -1024,6 +1017,8 @@
             left: 50%;
             margin-top: 0.5em;
             transform: translateX(-50%);
+            width: 100px;
+            height: auto;
         }
     </style>
 </head>
@@ -1068,6 +1063,10 @@
                 <label for="enableSelection">Enable kanji selection</label>
                 <input autocomplete="off" type="checkbox" id="enableSelection">
             </div>
+        </div>
+
+        <div class="settings-item">
+            <button id="quizBtn">quiz</button>
         </div>
 
         <div class="settings-item">
@@ -1134,7 +1133,6 @@
     </div>
 
     <button id="lastBtn">last</button>
-    <button id="quizBtn">quiz</button>
 
     <div id="quiz-popup" class="quiz-popup" style="display: none;">
         <!-- Add your quiz options here -->
@@ -1146,7 +1144,6 @@
         <button id="close-quiz-btn">x</button>
 
         <div class="quiz-item">
-            <div id="quizTitle">?</div>
             <div id="question-display">&nbsp;&nbsp;&nbsp;</div>
             <input type="text" id="user-answer" placeholder="Enter the keyword">
             <img id="end-quiz-gif" style="display: none;">
@@ -1525,7 +1522,7 @@
                                 borderWidth: 0, //not working
                                 pointBorderColor: 'transparent',
                                 radius: 1,
-                                hoverRadius:5,
+                                hoverRadius: 5,
                             }
                         },
                         scales: {
@@ -1542,7 +1539,10 @@
                                 min: 60,
                                 max: 100,
                                 ticks: {
-                                    // forces step size to be 50 units
+                                    // Include a callback function that appends '%' to the label
+                                    callback: function (value, index, values) {
+                                        return value + '%';
+                                    },
                                     stepSize: 2
                                 }
                             }
@@ -2300,7 +2300,7 @@
 
                         if (userAnswer.value === keyword) {
                             // If the user's answer is correct, change the border of the input
-                            userAnswer.style.border = '2px solid green';
+                            userAnswer.style.border = '5px solid green';
 
                             // Clear the input for the next question
                             userAnswer.value = '';
@@ -2309,7 +2309,7 @@
                             displayNextKanji();
                         } else {
                             // If the user's answer is incorrect, change the border of the input
-                            userAnswer.style.border = '2px solid red';
+                            userAnswer.style.border = '5px solid red';
                         }
                     };
 
@@ -2323,9 +2323,11 @@
 
 
             });  //end doc ready
-
+            const settingsPopup = document.getElementById('settings-popup');
             document.getElementById('quizBtn').addEventListener('click', function () {
                 document.getElementById('quiz-popup').style.display = 'block';
+                // Hide the popup
+                settingsPopup.style.display = 'none';
             });
 
             document.getElementById('close-quiz-btn').addEventListener('click', function () {
