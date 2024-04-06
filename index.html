@@ -1020,6 +1020,11 @@
             width: 100px;
             height: auto;
         }
+
+        #boxes{
+            width: 10%;
+            height: auto;
+        }
     </style>
 </head>
 
@@ -1089,6 +1094,7 @@
 
         <canvas id="myChart"></canvas>
         <canvas id="retentionChart"></canvas>
+        <canvas id="boxes"></canvas>
 
 
         <h3>Other Stats:</h3>
@@ -2320,6 +2326,67 @@
                 // Add a click event listener to the start quiz button
                 startQuizBtn.addEventListener('click', clickHandler);
 
+                const leitnerBoxes = getTodaysData(leitnerData);
+
+                // Calculate the total number of kanji in each box
+                const boxTotals = Object.values(leitnerBoxes).reduce((totals, box) => {
+                    if (box >= 1 && box <= 8) {
+                        totals[box - 2]++;
+                    }
+                    return totals;
+                }, Array(8).fill(0));
+
+                const bar = document.getElementById('boxes').getContext('2d');
+                new Chart(bar, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Box 1', 'Box 2', 'Box 3', 'Box 4', 'Box 5', 'Box 6', 'Box 7', 'Box 8'],
+                        datasets: [{
+                            data: boxTotals,
+                            backgroundColor: [
+                                '#E67373',
+                                '#E6C973',
+                                '#ACE673',
+                                '#73E690',
+                                '#73E6E6',
+                                '#7390E6',
+                                '#AC73E6',
+                                '#EE82EE'
+                            ],
+                            borderColor: [
+                                '#E67373',
+                                '#E6C973',
+                                '#ACE673',
+                                '#73E690',
+                                '#73E6E6',
+                                '#7390E6',
+                                '#AC73E6',
+                                '#EE82EE'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Kanji Distribution in Leitner Boxes'
+                            }
+                        },
+                        animation: {
+                            duration: 0
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
 
 
             });  //end doc ready
@@ -2514,6 +2581,23 @@
             }
 
 
+            function getTodaysData(leitnerData) {
+                // get today's date in "koohii_YYYY-MM-DD" format
+                let today = new Date();
+                let formattedDate = "koohii_" + today.getFullYear() + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+
+                // get today's data from leitnerData
+                let todaysData = leitnerData[formattedDate];
+
+                // if there's no data for today, get the data for the previous day
+                if (!todaysData) {
+                    today.setDate(today.getDate() - 1);
+                    formattedDate = "koohii_" + today.getFullYear() + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+                    todaysData = leitnerData[formattedDate];
+                }
+
+                return todaysData;
+            }
 
 
 
