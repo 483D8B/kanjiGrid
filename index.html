@@ -20,6 +20,8 @@
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"
         defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2/dist/chartjs-plugin-datalabels.min.js" defer></script>
+
     <link rel="preload" href="KanjiStrokeOrders.woff" as="font" type="font/woff" crossorigin>
 
 
@@ -2174,6 +2176,7 @@
                         }]
                     },
                     options: {
+                        maintainAspectRatio: true,
                         responsive: true,
                         plugins: {
                             legend: {
@@ -2182,17 +2185,29 @@
                             title: {
                                 display: true,
                                 text: 'Kanji Distribution in Leitner Boxes'
+                            },
+                            datalabels: {
+                                color: '#000000',
+                                anchor: 'top',
+                                align: 'top',
+                                formatter: Math.round,
+                                font: {
+                                    weight: 'bold',
+                                    fontColor: 'white',
+                                    size: 16,
+                                }
                             }
                         },
                         animation: {
-                            duration: 0
+                            animation: false,
                         },
                         scales: {
                             y: {
                                 beginAtZero: true
                             }
                         }
-                    }
+                    },
+                    plugins: [ChartDataLabels]  // Register the plugin only for this chart
                 });
 
 
