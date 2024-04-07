@@ -20,7 +20,8 @@
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"
         defer></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2/dist/chartjs-plugin-datalabels.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2/dist/chartjs-plugin-datalabels.min.js"
+        defer></script>
 
     <link rel="preload" href="KanjiStrokeOrders.woff" as="font" type="font/woff" crossorigin>
 
@@ -1725,7 +1726,10 @@
                         handleOn(searchValue, divTableCells);
                     } else if (searchValue.startsWith("kun:")) {
                         handleKun(searchValue, divTableCells);
-                    } else {
+                    } else if (searchValue.includes("-")) {
+                        handleRange(searchValue, divTableCells);
+                    }
+                    else {
                         handleSearch(searchWords, divTableCells);
                     }
 
@@ -2512,6 +2516,16 @@
                     }
                 }
             }
+
+            function handleRange(searchValue, divTableCells) {
+                let range = searchValue.split('-').map(Number);
+                divTableCells.forEach(cell => {
+                    const framenr = Number(cell.querySelector('.framenr').textContent);
+                    cell.style.display = (framenr >= range[0] && framenr <= range[1]) ? 'block' : 'none';
+                });
+            }
+
+
 
 
 
