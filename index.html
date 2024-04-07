@@ -15,7 +15,7 @@
     <script src="ref-patterns.min.js" defer></script>
     <script src="readings.min.js" defer></script>
     <script src="wanakana.min.js"></script>
-    <script src="vocabulary.js" defer></script>
+    <script src="voc.js" defer></script>
     <script src="stories.min.js" defer></script>
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"
@@ -122,6 +122,29 @@
             border-radius: 0.5em;
             border: 1px solid black;
             margin: 1px;
+        }
+
+        .relatedVocab {
+            font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+            padding: 0.5em;
+            font-weight: 600;
+            background-color: #75D1B3;
+            color: white;
+            border-radius: 0.5em;
+            border: 1px solid black;
+            margin: 1px;
+            display: table;
+        }
+
+        .vocabRow {
+            display: table-row;
+        }
+
+        .vocabId,
+        .vocabMeaning,
+        .vocabPronounce {
+            display: table-cell;
+            padding: 0.5em;
         }
 
         .vocab-label {
@@ -607,6 +630,7 @@
             display: inline-block;
             position: absolute;
             border-radius: 2.5em;
+            user-select: none;
         }
 
         .search-box label {
@@ -1074,7 +1098,7 @@
         </div>
 
         <div class="settings-item">
-            <button id="quizBtn">quiz</button>
+            <button id="quizBtn">Quiz</button>
         </div>
 
         <div class="settings-item">
@@ -2214,8 +2238,30 @@
                     plugins: [ChartDataLabels]  // Register the plugin only for this chart
                 });
 
+                let showVocab = false;
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 't') {
+                        showVocab = !showVocab;
+                        divTableCells.forEach(cell => {
+                            let kanji = cell.querySelector('.kanji').textContent;
+                            let vocabDiv = cell.querySelector('.relatedVocab');
+                            if (showVocab) {
+                                if (!vocabDiv) {
+                                    displayVocabulary(cell, kanji);
+                                }
+                            } else {
+                                if (vocabDiv) {
+                                    cell.removeChild(vocabDiv);
+                                }
+                            }
+                        });
+                    }
+                });
+
 
             });  //end doc ready
+
             const settingsPopup = document.getElementById('settings-popup');
             document.getElementById('quizBtn').addEventListener('click', function () {
                 document.getElementById('quiz-popup').style.display = 'block';
@@ -2485,8 +2531,14 @@
             }
 
             function handleSearch(searchWords, divTableCells) {
+                let displayedKanji = [];  // Array to store the displayed Kanji
+
                 if (searchWords.length === 0) {
-                    divTableCells.forEach(cell => cell.style.display = "block");
+                    divTableCells.forEach(cell => {
+                        cell.style.display = "block";
+                        let kanji = cell.querySelector('.kanji').textContent.trim();
+                        displayedKanji.push(kanji);  // Add the Kanji to the array
+                    });
                 } else {
                     let wholeWordFound = false;
                     divTableCells.forEach(cell => {
@@ -2500,7 +2552,11 @@
                             }
                         });
                         cell.style.display = found ? 'block' : 'none';
-                        if (found) wholeWordFound = true;
+                        if (found) {
+                            wholeWordFound = true;
+                            let kanji = cell.querySelector('.kanji').textContent.trim();
+                            displayedKanji.push(kanji);  // Add the Kanji to the array
+                        }
                     });
 
                     if (!wholeWordFound) {
@@ -2512,9 +2568,15 @@
                                 }
                             });
                             cell.style.display = found ? 'block' : 'none';
+                            if (found) {
+                                let kanji = cell.querySelector('.kanji').textContent.trim();
+                                displayedKanji.push(kanji);  // Add the Kanji to the array
+                            }
                         });
                     }
                 }
+
+                let relatedVocab = getRelatedVocab(displayedKanji);
             }
 
             function handleRange(searchValue, divTableCells) {
@@ -2525,6 +2587,41 @@
                 });
             }
 
+            function getRelatedVocab(kanjiArray) {
+                let relatedVocab = [];
+                kanjiArray.forEach(kanji => {
+                    for (let vocab in vocabulary) {
+                        if (vocab.includes(kanji)) {
+                            relatedVocab.push({ id: vocab, ...vocabulary[vocab][0] });
+                        }
+                    }
+                });
+                return relatedVocab;
+            }
+
+            function displayVocabulary(cell, kanji) {
+                let vocabList = getRelatedVocab([kanji]);
+                let vocabDiv = document.createElement('div');
+                vocabDiv.className = 'relatedVocab';
+                vocabList.forEach(vocab => {
+                    let row = document.createElement('div');
+                    row.className = 'vocabRow';
+                    let idDiv = document.createElement('div');
+                    idDiv.className = 'vocabId';
+                    idDiv.textContent = vocab.id;
+                    let meaningDiv = document.createElement('div');
+                    meaningDiv.className = 'vocabMeaning';
+                    meaningDiv.textContent = vocab.meaning;
+                    let pronounceDiv = document.createElement('div');
+                    pronounceDiv.className = 'vocabPronounce';
+                    pronounceDiv.textContent = vocab.pronounce;
+                    row.appendChild(idDiv);
+                    row.appendChild(meaningDiv);
+                    row.appendChild(pronounceDiv);
+                    vocabDiv.appendChild(row);
+                });
+                cell.appendChild(vocabDiv);
+            }
 
 
 
