@@ -1257,6 +1257,7 @@
             // Append the fragment to the table body
             tableBody.appendChild(fragment);
 
+            const divTableCells = document.querySelectorAll(".divTableCell");
 
 
             document.addEventListener("DOMContentLoaded", function () {
@@ -1325,7 +1326,6 @@
                     }
 
                     // Iterate over each visible divTableCell element
-                    const divTableCells = document.querySelectorAll(".divTableCell");
                     divTableCells.forEach(function (cell) {
                         // Extract the kanji text from the cell
                         var kanjiText = cell.querySelector('.kanji').textContent.trim();
@@ -1350,44 +1350,6 @@
                 });
 
 
-                // Toggle visibility of vocabulary cells
-                showVocabulary.addEventListener('click', function () {
-                    // Toggle the state
-                    showVocabularyState = !showVocabularyState;
-
-                    // Change button text based on the state
-                    if (showVocabularyState) {
-                        this.textContent = "Hide vocabulary";
-                    } else {
-                        this.textContent = "Show vocabulary";
-                    }
-
-                    // Iterate over each visible divTableCell element
-                    const divTableCells = document.querySelectorAll(".divTableCell");
-                    divTableCells.forEach(function (cell) {
-                        // Extract the kanji text from the cell
-                        var kanjiText = cell.querySelector('.kanji').textContent.trim();
-
-                        // Check if vocabulary already exists
-                        var vocabElement = cell.querySelector('.vocabulary');
-
-                        if (vocabElement) {
-                            // If vocabulary exists, remove it to toggle
-                            vocabElement.remove();
-                        } else {
-                            // Retrieve the vocabulary for the kanji
-                            var vocab = getVocabulary(kanjiText);
-
-                            // Append the vocabulary to the cell
-                            var newDiv = document.createElement("div");
-                            newDiv.className = 'vocabulary';
-                            newDiv.textContent = vocab;
-                            cell.appendChild(newDiv);
-                        }
-                    });
-                });
-
-
 
                 // Toggle visibility of stories cells
                 showStory.addEventListener('click', function () {
@@ -1398,7 +1360,6 @@
                     this.textContent = showStoryState ? "Hide stories" : "Show stories";
 
                     // Iterate over each visible divTableCell element
-                    const divTableCells = document.querySelectorAll(".divTableCell");
                     divTableCells.forEach(function (cell) {
                         // Modify the border and margin based on the state
                         if (showStoryState) {
@@ -1699,7 +1660,6 @@
                 let initialDataset = datasetKeys[0];
                 updateDateDisplay(initialDataset);
 
-                const divTableCells = document.querySelectorAll(".divTableCell");
                 const framenrElements = document.querySelectorAll(".framenr");
                 // Handle zoom slider change event
                 zoomSlider.addEventListener("input", function () {
@@ -2256,27 +2216,6 @@
                     plugins: [ChartDataLabels]  // Register the plugin only for this chart
                 });
 
-                let showVocab = false;
-
-                document.addEventListener('keydown', function (event) {
-                    if (event.key === 't') {
-                        showVocab = !showVocab;
-                        divTableCells.forEach(cell => {
-                            let kanji = cell.querySelector('.kanji').textContent;
-                            let vocabDiv = cell.querySelector('.relatedVocab');
-                            if (showVocab) {
-                                if (!vocabDiv) {
-                                    displayVocabulary(cell, kanji);
-                                }
-                            } else {
-                                if (vocabDiv) {
-                                    cell.removeChild(vocabDiv);
-                                }
-                            }
-                        });
-                    }
-                });
-
 
             });  //end doc ready
 
@@ -2399,24 +2338,43 @@
                 }
             }
 
-            // Function to retrieve vocabulary from vocabulary.js
-            function getVocabulary(kanji) {
-                // Find the entry in the vocabulary object corresponding to the given kanji
-                let vocabList = vocabulary[kanji];
+            let showVocab = false;
 
-                if (vocabList) {
-                    let vocab = "<span class='vocab-label'>Vocabulary:</span><br>";
-                    // Extract words and translations
-                    vocabList.forEach((entry, index) => {
-                        vocab += `${entry.word} - ${entry.translation}<br>`;
-                    });
-                    return vocab;
+            function toggleVocabulary() {
+                showVocab = !showVocab;
+                divTableCells.forEach(cell => {
+                    let kanji = cell.querySelector('.kanji').textContent;
+                    let vocabDiv = cell.querySelector('.relatedVocab');
+                    if (showVocab) {
+                        if (!vocabDiv) {
+                            displayVocabulary(cell, kanji);
+                        } else {
+                            vocabDiv.style.display = 'block';
+                        }
+                    } else {
+                        if (vocabDiv) {
+                            vocabDiv.style.display = 'none';
+                        }
+                    }
+                });
+
+                // Change button text based on the state
+                if (showVocab) {
+                    showVocabulary.textContent = "Hide vocabulary";
                 } else {
-                    return "Vocabulary data not found for " + kanji;
+                    showVocabulary.textContent = "Show vocabulary";
                 }
             }
 
-            // Function to retrieve vocabulary from vocabulary.js
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 't') {
+                    toggleVocabulary();
+                }
+            });
+
+            showVocabulary.addEventListener('click', toggleVocabulary);
+
+
             function getStory(kanji) {
                 // Find the entry in the vocabulary object corresponding to the given kanji
                 let story = stories[kanji];
