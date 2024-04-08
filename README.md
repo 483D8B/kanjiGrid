@@ -15,5 +15,6 @@ This project is a web-based tool designed to aid me visualize and tracking the p
 
     Dependencies
 
-    jQuery: JavaScript library for DOM manipulation and AJAX requests.
     Chart.js: JavaScript charting library for creating interactive charts.
+    chartjs-plugin-annotation.min.js
+    chartjs-plugin-datalabels.min.js
