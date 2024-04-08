@@ -134,22 +134,22 @@
             border: 1px solid black;
             margin: 1px;
             display: table;
-            line-height: 0;
         }
 
         .vocabRow {
-            display: table-row;
+            display: flex;
         }
 
-        .vocabId,
         .vocabMeaning,
         .vocabPronounce {
-            display: table-cell;
+            flex: 1;
             padding: 0.5em;
+            word-wrap: break-word;
         }
 
         .vocabId {
             font-size: 1.5em;
+            flex: 0 0 30%;
         }
 
         .vocab-label {
@@ -2622,18 +2622,23 @@
                         let vocab = vocabList[i];
                         let row = document.createElement('div');
                         row.className = 'vocabRow';
+
                         let idDiv = document.createElement('div');
                         idDiv.className = 'vocabId';
                         idDiv.textContent = vocab.id;
+
                         let meaningDiv = document.createElement('div');
                         meaningDiv.className = 'vocabMeaning';
                         meaningDiv.textContent = vocab.meaning;
+
                         let pronounceDiv = document.createElement('div');
                         pronounceDiv.className = 'vocabPronounce';
                         pronounceDiv.textContent = vocab.pronounce;
+
                         row.appendChild(idDiv);
                         row.appendChild(meaningDiv);
                         row.appendChild(pronounceDiv);
+
                         vocabContainer.appendChild(row);
                     }
                 };
