@@ -134,6 +134,7 @@
             border: 1px solid black;
             margin: 1px;
             display: table;
+            line-height: 0;
         }
 
         .vocabRow {
@@ -145,6 +146,10 @@
         .vocabPronounce {
             display: table-cell;
             padding: 0.5em;
+        }
+
+        .vocabId {
+            font-size: 1.5em;
         }
 
         .vocab-label {
@@ -914,6 +919,19 @@
             font-size: 1em;
         }
 
+
+        .showMoreButton {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            margin-top: 0.5em;
+            background-color: transparent;
+            border: 2px solid black;
+            padding: 2px;
+            font-family: Verdana, sans-serif;
+            color: black;
+        }
 
 
         .small-li {
@@ -2620,25 +2638,60 @@
                 let vocabList = getRelatedVocab(kanji);
                 let vocabDiv = document.createElement('div');
                 vocabDiv.className = 'relatedVocab';
-                vocabList.forEach(vocab => {
-                    let row = document.createElement('div');
-                    row.className = 'vocabRow';
-                    let idDiv = document.createElement('div');
-                    idDiv.className = 'vocabId';
-                    idDiv.textContent = vocab.id;
-                    let meaningDiv = document.createElement('div');
-                    meaningDiv.className = 'vocabMeaning';
-                    meaningDiv.textContent = vocab.meaning;
-                    let pronounceDiv = document.createElement('div');
-                    pronounceDiv.className = 'vocabPronounce';
-                    pronounceDiv.textContent = vocab.pronounce;
-                    row.appendChild(idDiv);
-                    row.appendChild(meaningDiv);
-                    row.appendChild(pronounceDiv);
-                    vocabDiv.appendChild(row);
-                });
+
+                // Create a container for the vocabulary items
+                let vocabContainer = document.createElement('div');
+                vocabContainer.className = 'vocabContainer';
+                vocabDiv.appendChild(vocabContainer);
+
+                // Function to display a set of vocabulary items
+                let displaySet = (start) => {
+                    for (let i = start; i < start + 5 && i < vocabList.length; i++) {
+                        let vocab = vocabList[i];
+                        let row = document.createElement('div');
+                        row.className = 'vocabRow';
+                        let idDiv = document.createElement('div');
+                        idDiv.className = 'vocabId';
+                        idDiv.textContent = vocab.id;
+                        let meaningDiv = document.createElement('div');
+                        meaningDiv.className = 'vocabMeaning';
+                        meaningDiv.textContent = vocab.meaning;
+                        let pronounceDiv = document.createElement('div');
+                        pronounceDiv.className = 'vocabPronounce';
+                        pronounceDiv.textContent = vocab.pronounce;
+                        row.appendChild(idDiv);
+                        row.appendChild(meaningDiv);
+                        row.appendChild(pronounceDiv);
+                        vocabContainer.appendChild(row);
+                    }
+                };
+
+                // Display the first set of vocabulary items
+                displaySet(0);
+
+                // If there are more vocabulary items, add a "Show More" button
+                if (vocabList.length > 5) {
+                    let showMoreButton = document.createElement('button');
+                    showMoreButton.textContent = 'Show More';
+                    showMoreButton.className = 'showMoreButton';
+                    showMoreButton.addEventListener('click', function () {
+                        // Remove the "Show More" button
+                        vocabDiv.removeChild(showMoreButton);
+
+                        // Display the next set of vocabulary items
+                        displaySet(vocabContainer.childNodes.length);
+
+                        // If there are still more vocabulary items, add the "Show More" button back
+                        if (vocabContainer.childNodes.length < vocabList.length) {
+                            vocabDiv.appendChild(showMoreButton);
+                        }
+                    });
+                    vocabDiv.appendChild(showMoreButton);
+                }
+
                 cell.appendChild(vocabDiv);
             }
+
 
 
 
