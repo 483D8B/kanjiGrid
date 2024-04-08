@@ -2518,15 +2518,20 @@
                 } else {
                     let wholeWordFound = false;
                     divTableCells.forEach(cell => {
-                        const cellText = cell.textContent.toLowerCase();
+                        // Only consider the text content of the .kanji, .keyword, and .framenr elements
+                        const kanjiText = cell.querySelector('.kanji').textContent.trim().toLowerCase();
+                        const keywordText = cell.querySelector('.keyword').textContent.trim().toLowerCase();
+                        const framenrText = cell.querySelector('.framenr').textContent.trim().toLowerCase();
+
                         let found = searchWords.some(word => {
                             if (alphanumericRegex.test(word)) {
                                 const regex = new RegExp("\\b" + word + "\\b", "i");
-                                return regex.test(cellText);
+                                return regex.test(kanjiText) || regex.test(keywordText) || regex.test(framenrText);
                             } else {
-                                return cellText.includes(word);
+                                return kanjiText.includes(word) || keywordText.includes(word) || framenrText.includes(word);
                             }
                         });
+
                         cell.style.display = found ? 'block' : 'none';
                         if (found) {
                             wholeWordFound = true;
@@ -2537,12 +2542,17 @@
 
                     if (!wholeWordFound) {
                         divTableCells.forEach(cell => {
-                            const cellText = cell.textContent.toLowerCase();
+                            // Only consider the text content of the .kanji, .keyword, and .framenr elements
+                            const kanjiText = cell.querySelector('.kanji').textContent.trim().toLowerCase();
+                            const keywordText = cell.querySelector('.keyword').textContent.trim().toLowerCase();
+                            const framenrText = cell.querySelector('.framenr').textContent.trim().toLowerCase();
+
                             let found = searchWords.some(word => {
                                 if (alphanumericRegex.test(word)) {
-                                    return cellText.includes(word);
+                                    return kanjiText.includes(word) || keywordText.includes(word) || framenrText.includes(word);
                                 }
                             });
+
                             cell.style.display = found ? 'block' : 'none';
                             if (found) {
                                 let kanji = cell.querySelector('.kanji').textContent.trim();
@@ -2562,6 +2572,10 @@
 
                 let relatedVocab = displayedKanji.map(kanji => getRelatedVocab(kanji));
             }
+
+
+
+
 
             function handleRange(searchValue, divTableCells) {
                 let range = searchValue.split('-').map(Number);
