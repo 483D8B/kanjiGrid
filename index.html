@@ -2576,7 +2576,15 @@
                     }
                 }
 
-                let relatedVocab = getRelatedVocab(displayedKanji);
+                // Hide the vocabulary after a search
+                divTableCells.forEach(cell => {
+                    let vocabDiv = cell.querySelector('.relatedVocab');
+                    if (vocabDiv) {
+                        vocabDiv.style.display = 'none';
+                    }
+                });
+
+                let relatedVocab = displayedKanji.map(kanji => getRelatedVocab(kanji));
             }
 
             function handleRange(searchValue, divTableCells) {
@@ -2587,20 +2595,29 @@
                 });
             }
 
-            function getRelatedVocab(kanjiArray) {
+            let vocabCache = {};
+
+            function getRelatedVocab(kanji) {
+                // If we've already computed the related vocab for this kanji, return the cached result
+                if (vocabCache[kanji]) {
+                    return vocabCache[kanji];
+                }
+
                 let relatedVocab = [];
-                kanjiArray.forEach(kanji => {
-                    for (let vocab in vocabulary) {
-                        if (vocab.includes(kanji)) {
-                            relatedVocab.push({ id: vocab, ...vocabulary[vocab][0] });
-                        }
+                for (let vocab in vocabulary) {
+                    if (vocab.includes(kanji)) {
+                        relatedVocab.push({ id: vocab, ...vocabulary[vocab][0] });
                     }
-                });
+                }
+
+                // Cache the result for future use
+                vocabCache[kanji] = relatedVocab;
+
                 return relatedVocab;
             }
 
             function displayVocabulary(cell, kanji) {
-                let vocabList = getRelatedVocab([kanji]);
+                let vocabList = getRelatedVocab(kanji);
                 let vocabDiv = document.createElement('div');
                 vocabDiv.className = 'relatedVocab';
                 vocabList.forEach(vocab => {
