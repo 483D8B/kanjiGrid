@@ -1099,21 +1099,11 @@
             border: 2px solid black;
         }
 
-        #sendToDbBtn {
-            background-color: #A06D7F;
-            border-radius: 15px;
-            border: 2px solid black;
-            margin-left: 5px;
-            float: right;
-            padding: 0.2em;
-            font-family: Verdana, sans-serif;
-            color: white;
-            font-size: 0.8em;
-        }
 
-        #sendToDbBtn:active {
+        .dbButtons:active {
             background-color: #8d5869;
         }
+
 
         #localVocabDisplayDiv {
             width: 80%;
@@ -1153,6 +1143,26 @@
             font-weight: 900;
             background-color: transparent;
             border: 1px solid transparent;
+        }
+
+        .dbButtons {
+            background-color: #A06D7F;
+            border-radius: 15px;
+            border: 2px solid black;
+            margin-left: 5px;
+            float: right;
+            padding: 0.2em;
+            font-family: Verdana, sans-serif;
+            color: white;
+            font-size: 0.8em;
+        }
+
+        #sendToDbBtn {
+            position: absolute;
+            padding: 0.5em;
+            bottom: 0;
+            left: 50%;
+            margin-bottom: 1em;
         }
     </style>
 </head>
@@ -1198,7 +1208,8 @@
                 <input autocomplete="off" type="checkbox" id="enableSelection">
             </div>
             <input type="password" id="login" placeholder="Password" />
-            <button id="sendToDbBtn">Send to db</button>
+            <button class="dbButtons" id="reviewBeforeDbSend">Review data</button>
+
 
         </div>
 
@@ -1373,6 +1384,7 @@
                 const deleteButton = document.querySelector("#deleteSearch"); // Define deleteButton as a JavaScript object
                 let localVocabDisplayDiv = document.getElementById('localVocabDisplayDiv');
 
+                let reviewButton = document.getElementById('reviewBeforeDbSend');
                 let sendButton = document.getElementById('sendToDbBtn');
                 let passwordInput = document.getElementById('login');
 
@@ -2313,35 +2325,11 @@
                 });
 
 
-                sendButton.addEventListener('click', () => {
-                    let data = JSON.parse(localStorage.getItem('vocabItems'));
-                    if (data && data.length > 0) {
-                        login(passwordInput).then(token => {
-                            fetch('https://483d8b.pythonanywhere.com/addVocab', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': 'Bearer ' + token
-                                },
-                                body: JSON.stringify(data),
-                            })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error(`HTTP error! status: ${response.status}`);
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    sendButton.style.backgroundColor = 'green';
-                                    localStorage.removeItem('vocabItems');
-                                })
-                                .catch(error => {
-                                    console.error('There was a problem with the fetch operation: ', error);
-                                    sendButton.style.backgroundColor = 'red';
-                                });
-                        });
-                    }
+                reviewButton.addEventListener('click', () => {
+                    displayLocalStorageContent(localVocabDisplayDiv, passwordInput)
                 });
+
+
 
 
             });  //end doc ready
@@ -2497,7 +2485,6 @@
                 if (document.activeElement.tagName.toLowerCase() !== 'input') {
                     if (event.key === 't') {
                         toggleVocabulary();
-                        displayLocalStorageContent(localVocabDisplayDiv);
                     }
                 }
             });
@@ -2857,7 +2844,7 @@
             }
 
 
-            function displayLocalStorageContent(localVocabDisplayDiv) {
+            function displayLocalStorageContent(localVocabDisplayDiv, passwordInput) {
                 // Clear the div
                 localVocabDisplayDiv.innerHTML = '';
 
@@ -2869,6 +2856,45 @@
                     localVocabDisplayDiv.style.display = 'none';
                 });
                 localVocabDisplayDiv.appendChild(closeButton);
+
+                let sendButton = document.createElement('button');
+                sendButton.className = 'dbButtons';
+                sendButton.id = 'sendToDbBtn';
+                sendButton.innerText = 'Send to db';
+
+                sendButton.addEventListener('click', () => {
+                    let data = JSON.parse(localStorage.getItem('vocabItems'));
+
+                    if (data && data.length > 0) {
+                        login(passwordInput).then(token => {
+                            fetch('https://483d8b.pythonanywhere.com/addVocab', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer ' + token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    sendButton.style.backgroundColor = 'green';
+                                    localStorage.removeItem('vocabItems');
+                                })
+                                .catch(error => {
+                                    console.error('There was a problem with the fetch operation: ', error);
+                                    sendButton.style.backgroundColor = 'red';
+                                });
+                        });
+                    }
+                });
+
+
+                localVocabDisplayDiv.appendChild(sendButton);
 
                 // Create a new div for the vocabulary items
                 let vocabItemsDiv = document.createElement('div');
@@ -2901,6 +2927,7 @@
                         let removeButton = document.createElement('button');
                         removeButton.className = 'removeButton';
                         removeButton.innerText = '-';
+
                         removeButton.addEventListener('click', () => {
                             // Remove the item from the vocabItems array
                             vocabItems.splice(index, 1);
@@ -2917,6 +2944,7 @@
                         row.appendChild(meaningDiv);
                         row.appendChild(pronounceDiv);
                         row.appendChild(removeButton);
+
 
                         // Append the row to the vocabItemsDiv
                         vocabItemsDiv.appendChild(row);
