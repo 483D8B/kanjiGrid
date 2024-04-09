@@ -1070,6 +1070,90 @@
             width: 10%;
             height: auto;
         }
+
+        .insertButton {
+            display: block;
+            padding: 0.2em;
+            border: 2px solid black;
+            background-color: transparent;
+            margin: 0.2em;
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 0.2em;
+        }
+
+        .insertButton:active {
+            background-color: aliceblue;
+        }
+
+        #login {
+            width: 20vw;
+            height: 2.5em;
+            font-size: 1em;
+            line-height: 3em;
+            margin-left: 1em;
+            text-align: center;
+            border-radius: 10px;
+            outline-color: #F96D00;
+            background-color: whitesmoke;
+            border: 2px solid black;
+        }
+
+        #sendToDbBtn {
+            background-color: #A06D7F;
+            border-radius: 15px;
+            border: 2px solid black;
+            margin-left: 5px;
+            float: right;
+            padding: 0.2em;
+            font-family: Verdana, sans-serif;
+            color: white;
+            font-size: 0.8em;
+        }
+
+        #sendToDbBtn:active {
+            background-color: #8d5869;
+        }
+
+        #localVocabDisplayDiv {
+            width: 80%;
+            margin: auto;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 0.5em;
+            font-family: Arial, sans-serif;
+            color: #212529;
+        }
+
+        .removeButton {
+            display: block;
+            padding: 0.2em;
+            border: 2px solid black;
+            background-color: transparent;
+            margin: 0.2em;
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 0.2em;
+        }
+
+        .removeButton:active {
+            background-color: aliceblue;
+        }
+
+        .closeButton {
+            position: sticky;
+            top: 0;
+            margin-bottom: 0.2em;
+            left: 97%;
+            height: auto;
+            width: auto;
+            font-size: 200%;
+            cursor: pointer;
+            font-weight: 900;
+            background-color: transparent;
+            border: 1px solid transparent;
+        }
     </style>
 </head>
 
@@ -1113,6 +1197,9 @@
                 <label for="enableSelection">Enable kanji selection</label>
                 <input autocomplete="off" type="checkbox" id="enableSelection">
             </div>
+            <input type="password" id="login" placeholder="Password" />
+            <button id="sendToDbBtn">Send to db</button>
+
         </div>
 
         <div class="settings-item">
@@ -1184,6 +1271,8 @@
     </div>
 
     <button id="lastBtn">last</button>
+
+    <div id="localVocabDisplayDiv" class="quiz-popup" style="display: none;"></div>
 
     <div id="quiz-popup" class="quiz-popup" style="display: none;">
         <!-- Add your quiz options here -->
@@ -1258,6 +1347,9 @@
             tableBody.appendChild(fragment);
 
             const divTableCells = document.querySelectorAll(".divTableCell");
+            let vocabCache = {};
+            let vocabItems = JSON.parse(localStorage.getItem('vocabItems')) || [];
+            let token;
 
 
             document.addEventListener("DOMContentLoaded", function () {
@@ -1279,6 +1371,10 @@
                 const enableSelectionCheckbox = document.getElementById("enableSelection");
                 const searchInput = document.querySelector("#mySearch"); // Define searchInput as a JavaScript object
                 const deleteButton = document.querySelector("#deleteSearch"); // Define deleteButton as a JavaScript object
+                let localVocabDisplayDiv = document.getElementById('localVocabDisplayDiv');
+
+                let sendButton = document.getElementById('sendToDbBtn');
+                let passwordInput = document.getElementById('login');
 
                 const Readings = { 1: 3 }
 
@@ -2217,6 +2313,37 @@
                 });
 
 
+                sendButton.addEventListener('click', () => {
+                    let data = JSON.parse(localStorage.getItem('vocabItems'));
+                    if (data && data.length > 0) {
+                        login(passwordInput).then(token => {
+                            fetch('https://483d8b.pythonanywhere.com/addVocab', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer ' + token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    sendButton.style.backgroundColor = 'green';
+                                    localStorage.removeItem('vocabItems');
+                                })
+                                .catch(error => {
+                                    console.error('There was a problem with the fetch operation: ', error);
+                                    sendButton.style.backgroundColor = 'red';
+                                });
+                        });
+                    }
+                });
+
+
             });  //end doc ready
 
             const settingsPopup = document.getElementById('settings-popup');
@@ -2367,8 +2494,11 @@
             }
 
             document.addEventListener('keydown', function (event) {
-                if (event.key === 't') {
-                    toggleVocabulary();
+                if (document.activeElement.tagName.toLowerCase() !== 'input') {
+                    if (event.key === 't') {
+                        toggleVocabulary();
+                        displayLocalStorageContent(localVocabDisplayDiv);
+                    }
                 }
             });
 
@@ -2585,21 +2715,18 @@
                 });
             }
 
-            let vocabCache = {};
 
             function getRelatedVocab(kanji) {
                 // If we've already computed the related vocab for this kanji, return the cached result
                 if (vocabCache[kanji]) {
                     return vocabCache[kanji];
                 }
-
                 let relatedVocab = [];
                 for (let vocab in vocabulary) {
                     if (vocab.includes(kanji)) {
                         relatedVocab.push({ id: vocab, ...vocabulary[vocab][0] });
                     }
                 }
-
                 // Cache the result for future use
                 vocabCache[kanji] = relatedVocab;
 
@@ -2608,6 +2735,22 @@
 
             function displayVocabulary(cell, kanji) {
                 let vocabList = getRelatedVocab(kanji);
+                let vocabDiv = createVocabDiv(vocabList);
+
+                cell.appendChild(vocabDiv);
+            }
+
+
+            function displaySet(vocabContainer, vocabList, start) {
+                for (let i = start; i < start + 5 && i < vocabList.length; i++) {
+                    let vocab = vocabList[i];
+                    let row = createVocabRow(vocab);
+
+                    vocabContainer.appendChild(row);
+                }
+            }
+
+            function createVocabDiv(vocabList) {
                 let vocabDiv = document.createElement('div');
                 vocabDiv.className = 'relatedVocab';
 
@@ -2616,16 +2759,136 @@
                 vocabContainer.className = 'vocabContainer';
                 vocabDiv.appendChild(vocabContainer);
 
-                // Function to display a set of vocabulary items
-                let displaySet = (start) => {
-                    for (let i = start; i < start + 5 && i < vocabList.length; i++) {
-                        let vocab = vocabList[i];
+                // Display the first set of vocabulary items
+                displaySet(vocabContainer, vocabList, 0);
+
+                // If there are more vocabulary items, add a "Show More" button
+                if (vocabList.length > 5) {
+                    let showMoreButton = createShowMoreButton(vocabContainer, vocabList);
+                    vocabDiv.appendChild(showMoreButton);
+                }
+
+                return vocabDiv;
+            }
+
+            function createShowMoreButton(vocabContainer, vocabList) {
+                let showMoreButton = document.createElement('button');
+                showMoreButton.textContent = 'Show More';
+                showMoreButton.className = 'showMoreButton';
+                showMoreButton.addEventListener('click', function () {
+                    // Remove the "Show More" button
+                    vocabDiv.removeChild(showMoreButton);
+
+                    // Display the next set of vocabulary items
+                    displaySet(vocabContainer, vocabList, vocabContainer.childNodes.length);
+
+                    // If there are still more vocabulary items, add the "Show More" button back
+                    if (vocabContainer.childNodes.length < vocabList.length) {
+                        vocabDiv.appendChild(showMoreButton);
+                    }
+                });
+
+                return showMoreButton;
+            }
+
+            function createVocabRow(vocab) {
+                let row = document.createElement('div');
+                row.className = 'vocabRow';
+
+                let idDiv = document.createElement('div');
+                idDiv.className = 'vocabId';
+                idDiv.textContent = vocab.id;
+
+                let meaningDiv = document.createElement('div');
+                meaningDiv.className = 'vocabMeaning';
+                meaningDiv.textContent = vocab.meaning;
+
+                let pronounceDiv = document.createElement('div');
+                pronounceDiv.className = 'vocabPronounce';
+                pronounceDiv.textContent = vocab.pronounce;
+
+                let button = document.createElement('button');
+                button.className = 'insertButton';
+                button.innerText = '+';
+
+                // Add event listener
+                button.addEventListener('click', () => {
+                    let data = {
+                        'vocab': vocab.id,
+                        'meaning': meaningDiv.textContent,
+                        'pronounce': pronounceDiv.textContent
+                    };
+                    vocabItems.push(data);
+                    localStorage.setItem('vocabItems', JSON.stringify(vocabItems));
+                });
+
+                row.appendChild(idDiv);
+                row.appendChild(meaningDiv);
+                row.appendChild(pronounceDiv);
+                row.appendChild(button);
+
+                return row;
+            }
+
+            // Function to log in and get the token
+            function login(passwordInput) {
+                return new Promise((resolve, reject) => {
+                    fetch('https://483d8b.pythonanywhere.com/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `password=${passwordInput.value}`,
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            resolve(data.token);
+                        })
+                        .catch(error => {
+                            console.error('There was a problem with the fetch operation: ', error);
+                            reject(error);
+                        });
+                });
+            }
+
+
+            function displayLocalStorageContent(localVocabDisplayDiv) {
+                // Clear the div
+                localVocabDisplayDiv.innerHTML = '';
+
+                // Create a close button
+                let closeButton = document.createElement('button');
+                closeButton.innerText = 'x';
+                closeButton.className = 'closeButton';
+                closeButton.addEventListener('click', () => {
+                    localVocabDisplayDiv.style.display = 'none';
+                });
+                localVocabDisplayDiv.appendChild(closeButton);
+
+                // Create a new div for the vocabulary items
+                let vocabItemsDiv = document.createElement('div');
+
+                // Get data from localStorage
+                let vocabItems = localStorage.getItem('vocabItems');
+
+                // Parse JSON string to an object
+                vocabItems = JSON.parse(vocabItems);
+
+                // Check if vocabItems is not null
+                if (vocabItems && vocabItems.length > 0) {
+                    // Loop through each item and add its content to the div
+                    vocabItems.forEach((vocab, index) => {
                         let row = document.createElement('div');
                         row.className = 'vocabRow';
 
                         let idDiv = document.createElement('div');
                         idDiv.className = 'vocabId';
-                        idDiv.textContent = vocab.id;
+                        idDiv.textContent = vocab.vocab;
 
                         let meaningDiv = document.createElement('div');
                         meaningDiv.className = 'vocabMeaning';
@@ -2635,41 +2898,39 @@
                         pronounceDiv.className = 'vocabPronounce';
                         pronounceDiv.textContent = vocab.pronounce;
 
+                        let removeButton = document.createElement('button');
+                        removeButton.className = 'removeButton';
+                        removeButton.innerText = '-';
+                        removeButton.addEventListener('click', () => {
+                            // Remove the item from the vocabItems array
+                            vocabItems.splice(index, 1);
+
+                            // Update localStorage
+                            localStorage.setItem('vocabItems', JSON.stringify(vocabItems));
+
+                            // Remove the row from the div
+                            vocabItemsDiv.removeChild(row);
+                        });
+
+                        // Append the idDiv, meaningDiv, pronounceDiv, and removeButton to the row
                         row.appendChild(idDiv);
                         row.appendChild(meaningDiv);
                         row.appendChild(pronounceDiv);
+                        row.appendChild(removeButton);
 
-                        vocabContainer.appendChild(row);
-                    }
-                };
-
-                // Display the first set of vocabulary items
-                displaySet(0);
-
-                // If there are more vocabulary items, add a "Show More" button
-                if (vocabList.length > 5) {
-                    let showMoreButton = document.createElement('button');
-                    showMoreButton.textContent = 'Show More';
-                    showMoreButton.className = 'showMoreButton';
-                    showMoreButton.addEventListener('click', function () {
-                        // Remove the "Show More" button
-                        vocabDiv.removeChild(showMoreButton);
-
-                        // Display the next set of vocabulary items
-                        displaySet(vocabContainer.childNodes.length);
-
-                        // If there are still more vocabulary items, add the "Show More" button back
-                        if (vocabContainer.childNodes.length < vocabList.length) {
-                            vocabDiv.appendChild(showMoreButton);
-                        }
+                        // Append the row to the vocabItemsDiv
+                        vocabItemsDiv.appendChild(row);
                     });
-                    vocabDiv.appendChild(showMoreButton);
+
+                    // Append the vocabItemsDiv to the localVocabDisplayDiv
+                    localVocabDisplayDiv.appendChild(vocabItemsDiv);
+
+                    // Toggle the display of the localVocabDisplayDiv
+                    localVocabDisplayDiv.style.display = localVocabDisplayDiv.style.display === 'none' ? 'block' : 'none';
+                } else {
+                    console.log('No items in localStorage');
                 }
-
-                cell.appendChild(vocabDiv);
             }
-
-
 
 
 
