@@ -2456,32 +2456,35 @@
             }
 
             let showVocab = false;
+            let vocabDivs = new Map();  // Cache for vocabDivs
 
             function toggleVocabulary() {
                 showVocab = !showVocab;
-                divTableCells.forEach(cell => {
-                    let kanji = cell.querySelector('.kanji').textContent;
-                    let vocabDiv = cell.querySelector('.relatedVocab');
-                    if (showVocab) {
-                        if (!vocabDiv) {
-                            displayVocabulary(cell, kanji);
-                        } else {
-                            vocabDiv.style.display = 'block';
-                        }
-                    } else {
-                        if (vocabDiv) {
-                            vocabDiv.style.display = 'none';
-                        }
-                    }
-                });
 
                 // Change button text based on the state
-                if (showVocab) {
-                    showVocabulary.textContent = "Hide vocabulary";
-                } else {
-                    showVocabulary.textContent = "Show vocabulary";
-                }
+                showVocabulary.textContent = showVocab ? "Hide vocabulary" : "Show vocabulary";
+
+                // Batch DOM updates using requestAnimationFrame
+                requestAnimationFrame(() => {
+                    divTableCells.forEach(cell => {
+                        let kanji = cell.querySelector('.kanji').textContent;
+                        let vocabDiv = vocabDivs.get(cell);
+                        if (showVocab) {
+                            if (!vocabDiv) {
+                                vocabDiv = displayVocabulary(cell, kanji);
+                                vocabDivs.set(cell, vocabDiv);  // Cache the vocabDiv
+                            }
+                            vocabDiv.style.display = 'block';
+                        } else {
+                            if (vocabDiv) {
+                                vocabDiv.style.display = 'none';
+                            }
+                        }
+                    });
+                });
             }
+
+
 
             document.addEventListener('keydown', function (event) {
                 if (document.activeElement.tagName.toLowerCase() !== 'input') {
@@ -2726,6 +2729,8 @@
                 let vocabDiv = createVocabDiv(vocabList);
 
                 cell.appendChild(vocabDiv);
+
+                return vocabDiv;
             }
 
 
@@ -2752,14 +2757,14 @@
 
                 // If there are more vocabulary items, add a "Show More" button
                 if (vocabList.length > 5) {
-                    let showMoreButton = createShowMoreButton(vocabContainer, vocabList);
+                    let showMoreButton = createShowMoreButton(vocabContainer, vocabList, vocabDiv);
                     vocabDiv.appendChild(showMoreButton);
                 }
 
                 return vocabDiv;
             }
 
-            function createShowMoreButton(vocabContainer, vocabList) {
+            function createShowMoreButton(vocabContainer, vocabList, vocabDiv) {
                 let showMoreButton = document.createElement('button');
                 showMoreButton.textContent = 'Show More';
                 showMoreButton.className = 'showMoreButton';
@@ -2997,7 +3002,7 @@
                         let vocabularyDetails = getVocabularyDetails(vocabulary, vocFromDb);
                     })
                     .catch(error => console.error('Error:', error));
-                    console.log('LOADED')
+                console.log('LOADED')
             });
 
 
