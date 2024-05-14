@@ -62,7 +62,6 @@
 
         .divTable {
             display: table;
-            margin-top: 1em;
         }
 
         body {
@@ -289,6 +288,25 @@
             margin-bottom: 1em;
         }
 
+        .legendContainer {
+            user-select: none;
+            font-family: Verdana, sans-serif;
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            float:right;
+            width: 200px;
+            margin-top: -2em;
+            margin-right: 0.2em;
+        }
+
+        .drawContainer {
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+            width: 100px;
+        }
+
 
         #zoomSlider {
             text-align: center;
@@ -430,13 +448,6 @@
 
         .key:nth-child(8) {
             background-color: #EE82EE;
-        }
-
-        p {
-            user-select: none;
-            font-family: Verdana, sans-serif;
-            margin-top: -15px;
-            text-align: center;
         }
 
         #settings {
@@ -824,8 +835,10 @@
 
         #draw {
             position: relative;
-            left: 0.5em;
-            margin-top: 0.8em;
+            left: 50%;
+            transform:translateX(-50%);
+            margin-top: 0.1em;
+            margin-bottom: 0.1em;
             text-align: center;
             background-color: #764C4C;
             border-radius: 0.5em;
@@ -1259,17 +1272,13 @@
 
     </div>
 
-    <form class="search-box">
-        <label for="mySearch">Search</label>
-        <input id="mySearch" type="text" placeholder="" />
-        <button id="deleteSearch" type="reset" aria-label="Delete Search">.</button>
-    </form>
-    <!-- <input id="mySearch" type="text" placeholder="Search..."> -->
-    <p>
+    <div class="legendContainer">
         Weak <span class="key"> </span><span class="key"> </span><span class="key"> </span><span
             class="key"> </span><span class="key"> </span><span class="key"> </span><span class="key"> </span><span
             class="key"> </span> Strong
+    </div>
 
+    <p>
         <button id="draw">Draw!</button>
     <div id="kanjiCanvasContainer" style="display: none;">
         <canvas id="can" class="kanji-canvas" data-candidate-list="candidateList" width="256" height="256"></canvas>
@@ -1280,6 +1289,16 @@
             <button class="buttonCanvas" title="(CTRL+F)">Recognize</button>
         </div>
     </div>
+    </p>
+
+
+    <form class="search-box">
+        <label for="mySearch">Search</label>
+        <input id="mySearch" type="text" placeholder="" />
+        <button id="deleteSearch" type="reset" aria-label="Delete Search">.</button>
+    </form>
+    <!-- <input id="mySearch" type="text" placeholder="Search..."> -->
+
 
     <button id="lastBtn">last</button>
 
@@ -1305,7 +1324,7 @@
 
 
 
-    </p>
+
 
     <!-- <div class="font_preload" style="opacity: 0">
         <span style="font-family: 'KanjiStrokeOrders',sans-serif;"></span>
@@ -1525,7 +1544,7 @@
                         fontSize = currentFontFamily !== fontStrokeOrder ? '12em' : '3em';
                         fontFamily = currentFontFamily !== fontStrokeOrder ? fontStrokeOrder : defaultFont;
                     } else if (fontSizeMultiplier === "0") {
-                        fontSize = currentFontFamily !== fontStrokeOrder ? '12em' : '0.8em';
+                        fontSize = currentFontFamily !== fontStrokeOrder ? '12em' : '0.7em';
                         fontFamily = currentFontFamily !== fontStrokeOrder ? fontStrokeOrder : defaultFont;
                     }
 
@@ -1774,8 +1793,8 @@
                 // Handle zoom slider change event
                 zoomSlider.addEventListener("input", function () {
                     const fontSizeMultiplier = this.value;
-                    const kanjiFontSize = fontSizeMultiplier === "1" ? "3em" : "0.80em";
-                    const framenrFontSize = fontSizeMultiplier === "1" ? "0.8em" : "0em";
+                    const kanjiFontSize = fontSizeMultiplier === "1" ? "3em" : "0.70em";
+                    const framenrFontSize = fontSizeMultiplier === "1" ? "0.7em" : "0em";
 
                     if (fontSizeMultiplier === "0") {
                         divTableCells.forEach((cell) => {
