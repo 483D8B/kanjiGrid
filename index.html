@@ -1825,7 +1825,9 @@
                     const datasetIndex = clampedValue - 1;
                     const selectedDataset = datasetKeys[datasetIndex];
 
-                    updateDateDisplay(selectedDataset);
+                    var nday = Object.keys(Differences)[sliderValue - 2] || 0;
+
+                    updateDateDisplay(selectedDataset,nday);
 
                     // Assuming Differences is the object containing the value
                     const nOfKanjiADayValue = Differences[sliderValue - 1] || 0;
@@ -1847,11 +1849,7 @@
                     var datess = Object.keys(leitnerData).filter(date => date !== "koohii_origin");
 
                     var dateString = datess[fileSlider.value - 2];
-
-                    // Remove the "koohii_" prefix from the date string
-                    var date = dateString.replace('koohii_', '');
-
-
+                    
                     // Get the kanji contributions for this day
                     var failedKanji = result.failedKanji[dateString];
 
@@ -1919,7 +1917,7 @@
                 let initialSliderValue = 1;
                 const datasetKeys = Object.keys(leitnerData);
                 let initialDataset = datasetKeys[0];
-                updateDateDisplay(initialDataset);
+                updateDateDisplay(initialDataset,0);
 
                 const framenrElements = document.querySelectorAll(".framenr");
                 // Handle zoom slider change event
@@ -2548,7 +2546,7 @@
             const nOfKanjiADayElement = document.querySelector("#nOfKanjiADay");
 
             // Define the updateDateDisplay function globally
-            function updateDateDisplay(selectedDataset) {
+            function updateDateDisplay(selectedDataset,nday) {
 
                 const datasetDates = Object.keys(leitnerData).map(dataset => ({
                     name: dataset,
@@ -2568,7 +2566,7 @@
                     selectedDayLabelElement.textContent = `${dateText}`;
                 }
 
-                dateElement.textContent = dateText;
+                dateElement.textContent = dateText + " - " + nday + "° day";
             }
             // Function to format the date similar to toDateString
             function formatDateToDateString(date) {
