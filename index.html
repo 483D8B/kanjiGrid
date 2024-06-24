@@ -294,7 +294,7 @@
             text-align: center;
             display: flex;
             flex-direction: row;
-            float:right;
+            float: right;
             width: 200px;
             margin-top: -2em;
             margin-right: 0.2em;
@@ -753,6 +753,19 @@
             text-align: center;
         }
 
+        #points {
+            display: inline-block;
+            position: relative;
+            font-family: Verdana, sans-serif;
+            color: #a29897;
+            background-color: white;
+            font-weight: 700;
+            font-size: 1em;
+            border: 2px solid black;
+            text-align: center;
+            width: 100%;
+        }
+
         #stats {
             border: 2px solid black;
             padding: 5px;
@@ -837,7 +850,7 @@
         #draw {
             position: relative;
             left: 50%;
-            transform:translateX(-50%);
+            transform: translateX(-50%);
             margin-top: 0.1em;
             margin-bottom: 0.1em;
             text-align: center;
@@ -1085,6 +1098,11 @@
             height: auto;
         }
 
+        #pointsChart {
+            width: 10%;
+            height: auto;
+        }
+
         .insertButton {
             display: block;
             padding: 0.2em;
@@ -1179,7 +1197,7 @@
             margin-bottom: 1em;
         }
 
-        #preview{
+        #preview {
             text-align: center;
             background-color: transparent;
             border: 2px solid black;
@@ -1189,10 +1207,38 @@
             border-radius: 0.5em;
         }
 
-        #preview:active{
+        #preview:active {
             background-color: lightgrey;
         }
 
+        .kanji-grid-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(1em, 1fr));
+            gap: 0.2em;
+            /* This creates some space between the cells */
+            padding: 0.5em;
+            font-size: 2em;
+        }
+
+        .kanji-points {
+            aspect-ratio: 1 / 1;
+            /* This makes the cells square */
+            display: flex;
+            /* These three lines center the text in the cells */
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-weight: normal;
+
+        }
+
+        .forgotten {
+            background-color: red;
+        }
+
+        .hard-to-remember {
+            background-color: orange;
+        }
     </style>
 </head>
 
@@ -1268,9 +1314,15 @@
             <div id="selectedDayLabel"></div>
         </div>
 
+        <div class="settings-item">
+            <div id="points"></div>
+        </div>
+
+
         <canvas id="myChart"></canvas>
         <canvas id="retentionChart"></canvas>
         <canvas id="boxes"></canvas>
+        <canvas id="pointsChart"></canvas>
 
 
         <h3>Other Stats:</h3>
@@ -1365,8 +1417,14 @@
             var tableBody = document.getElementById('table_body');
             var fragment = document.createDocumentFragment();
 
+            var dataMappingObject = {};
+
             // Loop through the data
             for (var i = 0; i < data.length; i++) {
+
+                // Add an entry to the dataMappingObject
+                dataMappingObject[data[i].id] = data[i].kanji;
+
                 // Create a new divTableCell
                 var divTableCell = document.createElement('div');
                 divTableCell.className = 'divTableCell';
@@ -1784,6 +1842,60 @@
                             cell.style.backgroundColor = "white";
                         }
                     });
+
+                    var div = document.getElementById('points');
+                    var datess = Object.keys(leitnerData).filter(date => date !== "koohii_origin");
+
+                    var dateString = datess[fileSlider.value - 2];
+
+                    // Remove the "koohii_" prefix from the date string
+                    var date = dateString.replace('koohii_', '');
+
+
+                    // Get the kanji contributions for this day
+                    var failedKanji = result.failedKanji[dateString];
+
+                    // Get the label of the selected day
+                    var label = pointslabels[fileSlider.value];
+
+                    // Remove old annotations
+                    myChart.options.plugins.annotation.annotations = [];
+
+                    // Add a new annotation at the selected day
+                    myChart.options.plugins.annotation.annotations.push({
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x',
+                        value: label,
+                        borderColor: 'blue',
+                        borderWidth: 2
+                    });
+
+
+                    // Initialize counters
+                    let countForgotten = 0;
+                    let countHardToRemember = 0;
+
+                    // Count the number of "Forgotten" and "Hard to remember" kanji
+                    for (var kanji in failedKanji) {
+                        if (failedKanji[kanji] === 'Forgotten') {
+                            countForgotten++;
+                        } else if (failedKanji[kanji] === 'Hard to remember') {
+                            countHardToRemember++;
+                        }
+                    }
+
+
+                    // Update the content of the div
+                    let html = '<p>Forgotten: ' + countForgotten + '</p>';
+                    html += '<p>Hard to remember: ' + countHardToRemember + '</p>';
+                    html += '<div class="kanji-grid-points">';
+                    for (var kanji in failedKanji) {
+                        let cssClass = failedKanji[kanji] === 'Hard to remember' ? 'hard-to-remember' : 'forgotten';
+                        html += '<div class="kanji-points ' + cssClass + '">' + kanji + '</div>';
+                    }
+                    html += '</div>';
+                    div.innerHTML = html;
 
 
                     // Remove existing vertical line annotations
@@ -2370,6 +2482,50 @@
                     displayLocalStorageContent(localVocabDisplayDiv, passwordInput)
                 });
 
+                const result = calculateDailyScore(leitnerData, dataMappingObject);
+                // Prepare the labels and data for the chart
+                const pointslabels = Object.keys(Differences);
+                const data = Object.values(result.scores);
+
+                // Get the canvas element
+                const pointsctx = document.getElementById('pointsChart').getContext('2d');
+
+                // Create the chart
+                var pointsChart = new Chart(pointsctx, {
+                    type: 'line',  // change this to 'bar', 'pie', etc. based on your preference
+                    data: {
+                        labels: pointslabels,
+                        datasets: [{
+                            label: 'Daily Score',
+                            data: data,
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1,
+                            pointRadius: 1,
+                            radius: 1,
+                            hoverRadius: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Score'
+                                }
+                            }
+                        }
+                    }
+                });
 
 
 
@@ -3046,18 +3202,18 @@
 
 
             document.getElementById('preview').addEventListener('click', function () {
-            
+
                 fileSlider.style.display = "none";
                 datasetDate.style.display = "none";
 
                 document.getElementById("draw").style.display = "none";
 
                 var elements = document.getElementsByClassName('zoomContainer');
-                for(var i = 0; i < elements.length; i++){
+                for (var i = 0; i < elements.length; i++) {
                     elements[i].style.display = 'none';
                 }
                 var elements = document.getElementsByClassName('legendContainer');
-                for(var i = 0; i < elements.length; i++){
+                for (var i = 0; i < elements.length; i++) {
                     elements[i].style.display = 'none';
                 }
 
@@ -3065,14 +3221,108 @@
                 element.style.top = 'auto';
                 element.style.display = 'inline-block';
                 element.style.position = 'relative';
-                element.style.marginBottom  = '0.5em';
+                element.style.marginBottom = '0.5em';
 
                 document.getElementById("settings").style.display = "none";
                 document.getElementById("lastBtn").click();
                 document.getElementById("mySearch").scrollIntoView();
                 document.getElementById("lastBtn").style.display = "none";
-                
+
             });
+
+            function calculateDailyScore(leitnerData, dataMappingObject) {
+                // Define the points for each box
+                const boxPoints = {
+                    1: 1,
+                    2: 2,
+                    3: 4,
+                    4: 8,
+                    5: 16,
+                    6: 32,
+                    7: 64,
+                    8: 128,
+                };
+
+                // Initialize an object to store the scores for each day
+                let dailyScores = {};
+
+                // Initialize an object to store the kanji that moved to a lower box each day
+                let dailyFailedKanji = {};
+
+                // Initialize an object to store the kanji contributions for each day
+                let dailyKanjiContributions = {};
+
+                // Initialize an object to store the previous day's data
+                let prevDayData = {};
+
+                // Loop over each day in the leitnerData
+                for (let day in leitnerData) {
+                    // Skip the "koohii_origin" entry
+                    if (day === "koohii_origin") continue;
+
+                    // Initialize the score for this day
+                    dailyScores[day] = 0;
+
+                    // Initialize the failed kanji for this day
+                    dailyFailedKanji[day] = [];
+
+                    // Initialize the kanji contributions for this day
+                    dailyKanjiContributions[day] = {};
+
+                    // Loop over each kanji in this day's data
+                    for (let kanjiId in leitnerData[day]) {
+                        // Get the box number for this kanji
+                        let box = leitnerData[day][kanjiId];
+
+                        // Get the kanji character for this kanji ID
+                        let kanji = dataMappingObject[kanjiId];
+
+                        // Add the kanji contribution for this day
+                        dailyKanjiContributions[day][kanji] = boxPoints[box];
+
+                        // Check if the box is defined in boxPoints
+                        if (box in boxPoints) {
+                            // Add the score for this box to the day's total score
+                            dailyScores[day] += boxPoints[box];
+
+                            // If this kanji was in a higher box the previous day, deduct points and add to failed kanji
+                            if (kanjiId in prevDayData && prevDayData[kanjiId] > box) {
+                                // Calculate the difference in box numbers
+                                let diff = prevDayData[kanjiId] - box;
+
+                                // Deduct points based on the difference
+                                dailyScores[day] -= diff * 100; // Change the multiplier as per your needs
+
+                                if (diff === 1) {
+                                    dailyFailedKanji[day][kanji] = 'Hard to remember';
+                                } else if (box === 2) {
+                                    dailyFailedKanji[day][kanji] = 'Forgotten';
+                                }
+
+
+                            }
+                        }
+                    }
+
+                    // Store this day's data for comparison with the next day
+                    prevDayData = leitnerData[day];
+                }
+
+                // Return the scores, failed kanji, and kanji contributions for each day
+                return { scores: dailyScores, failedKanji: dailyFailedKanji, kanjiContributions: dailyKanjiContributions };
+            }
+
+
+            // Create a debounce function
+            function debounce(func, delay) {
+                let debounceTimer;
+                return function () {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => func.apply(context, args), delay);
+                }
+            }
 
         </script>
 
